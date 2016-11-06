@@ -1,3 +1,4 @@
+
 #Learning Fair Classifiers
 
 This repository provides a logistic regression implementation in python for our fair classification mechanism introduced in [(Zafar et al., 2016)](http://arxiv.org/abs/1507.05259v3). Please cite the paper when using the code.

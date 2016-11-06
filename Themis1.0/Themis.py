@@ -101,8 +101,6 @@ class soft:
         return attr
 
 
-    #type = 0 means group
-    #type = 1 means causal
     def discriminationSearch(self,theta, confidence, epsilon, type):
         i=0
         lst = []
@@ -123,9 +121,9 @@ class soft:
                         break
                 if(found):
                     continue
-                if(type==0):
+                if("group" in type):
                     score = self.groupDiscrimination(list(X),99,0.1)
-                else:
+                elif("causal" in type):
                     score = self.causalDiscrimination(list(X),99,0.1)
                 if(score > theta):
                     D.append(list(X))

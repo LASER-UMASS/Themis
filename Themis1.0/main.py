@@ -53,7 +53,7 @@ soft = Themis.soft( software_name, names, values, num_values, command, type)
 
 
 
-D = soft.discriminationSearch(0.1,99,0.1,0)
+D = soft.discriminationSearch(0.1,99,0.1,"group")
 
 soft.printSoftwareDetails()
 

@@ -92,18 +92,22 @@ Number of attributes are  4
 
 Attribute name is  Sex
 Number of values taken by this attribute = 2
+
 The different values taken are  ['Male', 'Female'] 
 
 Attribute name is  Age
 Number of values taken by this attribute = 5
+
 The different values taken are  [2, 3, 4, 5, 6] 
 
 Attribute name is  Race
 Number of values taken by this attribute = 4
+
 The different values taken are  ['Red', 'Green', 'Yellow', 'Purple'] 
 
 Attribute name is  Income
 Number of values taken by this attribute = 4
+
 The different values taken are  [2, 3, 4, 5] 
 
 
@@ -120,12 +124,29 @@ The output above shows the different attributes and the discriminating ones.
 
 ——————————————————————————————————————————————————————
 
-##Code in folders : 
+##Code in subjectSystems folders : 
 
-A = Code for [22]. This is the system A described in paper.
+Different folders are : 
+A = Code for [1] along with themis scripts running over it.
 
-B,F = Folder contains the decision tree classifier code for [12] and fairness unaware decision tree
+B = Folder contains the decision tree classifier code for [2] 
 
-C,D  = Folder containing the code for [2] and [24]
+C,D  = Folder containing the code for [3] and [4] respectively.
 
 fairness_unaware = Folder containing the code for fairness unaware algorithms. These algorithms correspond to systems E,G,H described in our paper.
+
+    Here E = Naive Bayes
+         F = Decision Tree
+         G = Logistic Regression
+         H = Support Vector Machine
+
+
+##References 
+
+[1] Muhammad Bilal Zafar, Isabel Valera, Manuel Gomez Rodriguez, and Krishna P Gummadi. Learning fair classifiers. CoRR, abs/1507.05259, 2015.
+
+[2] Faisal Kamiran, Toon Calders, and Mykola Pechenizkiy. Discrimination aware decision tree learning. In International Conference on Data Mining (ICDM), pages 869–874, Sydney, Australia, December 2010.
+
+[3] Toon Calders, Faisal Kamiran, and Mykola Pechenizkiy. Building classifiers with independency constraints. In Proceedings of the 2009 IEEE International Conference on Data Mining (ICDM) Workshops, pages 13–18, Miami, FL, USA, December 2009.
+
+[4] Indre Zliobaite, Faisal Kamiran, and Toon Calders. Handling conditional discrimination. In International Conference on Data Mining (ICDM), pages 992–1001, Vancouver, BC, Canada, December 2011.

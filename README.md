@@ -34,18 +34,24 @@ Takes theta, confidence, epsilon and type as input.
 2) Add the function calls in the file main.py as per the need described below :
 
 a) Search the discriminating set of attributes : The function discriminationSearch tests the software for discrimination and returns all characteristic subsets which have discrimination score more than the threshold.
+
 Example input : software.discriminationSearch(0.1,99,0.1,0)
 Here the threshold = 0.1, confidence needed = 99%, epsilon/error tolerated = 0.1 = 10%, type = 0 means to test group fairness
 
 b) Group discrimination : The function to be called is groupDiscrimination which takes the following arguments :
+
 A list X : which contains the attribute indices against which discrimination is tested, confidence and epsilon/error.
+
 eg. X=[0,1] means the first and the second attributes are to be used. 
 groupDiscrimination(X,99,0.1) will call this function with confidence = 99% and epsilon = 0.1
 
 c) Causal discrimination : The function to be called is groupDiscrimination which takes the following arguments :
+
 A list X : which contains the attribute indices against which discrimination is tested, confidence and epsilon/error.
-eg. X=[0,1] means the first and the second attribute
-groupDiscrimination(X,99,0.1) will call this function with confidence = 99% and epsilon = 0.1
+
+eg. X=[0,1] means the first and the second attribute are to be used.
+
+causalDiscrimination(X,99,0.1) will call this function with confidence = 99% and epsilon = 0.1
 
 d) Print the software details : The function printSoftwareDetails prints the software details, the set of input attributes and the values it can take. It takes no arguments.
 

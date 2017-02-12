@@ -1,4 +1,4 @@
-2
+4
 1 Sex categorical Male,Female
 2 Age continuousInt 2,6
 3 Race categorical Red,Green,Yellow,Purple

@@ -11,16 +11,20 @@ names={}
 type={}
 values={}
 num_values={}
-
+count = 0
+nums = -1
 
 #read the settings file
 for line in f :
+    count = count + 1;	
     line = line.strip()
-    if( "command" in line):
+    if(count==1):
+        nums = int(line[0]) 
+    if( "command" in line and count==nums+2):
         line = line.split(" ")
         command  = " ".join(line[1:])
         continue
-    if( "name" in line):
+    if( "name" in line and count==nums+3):
         line = line.split(":")
         software_name  = " ".join(line[1:])
         continue
@@ -29,7 +33,7 @@ for line in f :
     else:
         line = line.split(' ')
         attr_no = int(line[0])-1
-        names[attr_no] = line[1]
+	names[attr_no] = line[1]
         type[attr_no] = line[2]
         
         if (line[2]=="categorical"):
@@ -53,7 +57,7 @@ soft = Themis.soft( software_name, names, values, num_values, command, type)
 
 
 
-D = soft.discriminationSearch(0.1,99,0.1,"group")
+D = soft.discriminationSearch(0.3,99,0.1,"group")
 
 soft.printSoftwareDetails()
 
@@ -62,4 +66,4 @@ print "Software discriminates against ",D,"\n"
 #X=[0,2]
 #print soft.groupDiscrimination(X,99,0.1)
 #print soft.causalDiscrimination(X,99,0.1)
-#print soft.getTestSuite()
+print soft.getTestSuite()

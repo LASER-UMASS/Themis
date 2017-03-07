@@ -49,31 +49,42 @@ def groupDiscrimination (self, X, confidence, epsilon):
         #print i
         #Convert i to the values for X
         attr = self.decodeValues(i,self.num,X)
-
+        #print "this is ",X, self.num,attr
         #TODO: Check cache elements first
-        (tr,fal) = self.ProcessCache(X,attr)
+        #        (tr,fal) = self.ProcessCache(X,attr)
         #print tr,fal,attr,X
+        tr = 0
+        fal=0
         r = tr+fal
         count = tr
         #print "cahce told ",tr,fal
         p=1
+        added_now=[]
         while r <= self.MaxSamples:
             #print r, maxPossible
             
             inp = self.randomInput(self.num,X,attr)
             
             if(tuple(inp) in self.cache.keys()):
+                
+                out = self.cache[tuple(inp)]
+                
                 if(r==maxPossible):
                     p = count*1.0/r
                     break
-                continue
+                if(inp in added_now):
+                    continue
+                        #                print inp,out
+
+            else:
         #print "inp",attr,inp,r,self.MaxSamples,p
             #Compute S(inp)
-            out = self.SoftwareTest(inp,self.num, self.values)
-            
+                out = self.SoftwareTest(inp,self.num, self.values)
+                self.cache[tuple(inp)] = out
+            added_now.append(inp)
             r+=1
             #print inp,out
-            self.cache[tuple(inp)] = out
+            #
 
             if out:
                 count += 1
@@ -93,6 +104,7 @@ def groupDiscrimination (self, X, confidence, epsilon):
         if(minGroup > p):
             minGroup = p
         i+=1
+    #print maxGroup, minGroup
     return maxGroup - minGroup
 
 

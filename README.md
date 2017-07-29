@@ -1,9 +1,5 @@
 # Themis
 
-Themis is a fairness testing tool. 
-
-## Overview
-
 Themis is a testing-based approach for measuring discrimination in a software
 system. For the best explanation of the underlying problem Themis solves,
 Themis algorithms, and an evaluation of Themis, read our paper [Fairness
@@ -217,7 +213,7 @@ regression), and H (support vector machines) in [1].
 [(http://people.cs.umass.edu/~brun/images/yuriy.jpg)](http://people.cs.umass.edu/~brun/)
 [Yuriy Brun](http://people.cs.umass.edu/~brun/)
 
-[(http://people.cs.umass.edu/~ameli/images/alexandra.jpg)](http://people.cs.umass.edu/~ameli/)
+![http://people.cs.umass.edu/~ameli/images/alexandra.jpg][http://people.cs.umass.edu/~ameli/]
 [Alexandra Meliou](http://people.cs.umass.edu/~ameli/)
 
 ## Funding

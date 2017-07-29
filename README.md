@@ -1,159 +1,248 @@
 # Themis
 
-The code for Themis is present in reporsitory names Themis1.0/
+Themis is a fairness testing tool. 
+
+## Overview
+
+Themis is a testing-based approach for measuring discrimination in a software
+system. For the best explanation of the underlying problem Themis solves,
+Themis algorithms, and an evaluation of Themis, read our paper [Fairness
+Testing: Testing Software for
+Discrimination](http://people.cs.umass.edu/~brun/pubs/pubs/Galhotra17fse.pdf).
+ This work won an ACM Distinguished Paper Award at the ESEC/FSE 2017
+conference.
+
+This repository contains Themis (in `Themis1.0/`), instructions for using
+Themis (this `README.md`), and subject systems on which Themis has been
+evaluated (`subjectSystems/`).
+
+## Measuring Discrimination 
+
+The Themis implementation measures two kinds of discrimination: group
+discrimination and causal discrimination. 
+
+Imagine you have a piece of software that determines if an applicant should
+be given a loan, and you want to know if this software discriminates with
+respect to race. (And let's say in this scenario, there are two races, green
+and purple.) One way to measure discrimination is to ask "do the same
+fractions of green and purple people get loans?" This measure is called
+*group* discrimination, and has been identified in prior work, e.g., [2, 3,
+4, 5], among others. Specifically, the group discrimination score is the
+difference between the largest and smallest fraction of people who get a loan
+in a set of groups of people (e.g., one group per race). If 40% of purple
+people get a loan but only 30% of green people get a loan, the discrimination
+score with respect to race is 40%-30%=10%.
+
+However, group discrimination has two limitations. First, it may fail to
+observe some discrimination. Suppose the software discriminates against half
+the purple people, e.g., those who live in Greenville, but discriminates for
+the other half of the purple people, e.g., those who live in Purpleville.
+These two kinds of discrimination can cancel out and be hidden by the group
+discrimination score. Second, software may circumvent discrimination
+detection. For example, suppose the software recommends loans for a random
+30% of the purple people, and the 30% of the green people who have the most
+savings. Then the group discrimination score with respect to race will deem
+the software perfectly fair, despite a clear discrepancy in how the
+applications are processed based on race.
+
+The *causal* discrimination score [1] addresses these shortcomings. Software
+testing enables a unique opportunity to conduct causal experiments to
+determine statistical causation between inputs and outputs. For example, it
+is possible to execute the software on two individuals identical in every way
+except race, and verify if changing the race causes a change in the output.
+Causal discrimination says that to be fair with respect to a set of
+characteristics, the software must produce the same output for every two
+individuals who differ only in those characteristics. For example, the
+software is fair with respect to race if for all pairs of individuals who are
+identical in every way except for race, the software either gives both of
+them or neither of them the loan. The fraction of people for whom software
+causally discriminates is a measure of causal discrimination.
+
+Measuring causal and group discrimination scores each have three input
+parameters:
+
+- set of input characteristics whose discrimination against to measure,
+- the desired confidence,
+- the allowable error bound for that confidence.
+
+The `discriminationSearch` function has four inputs:
+
+- theta: the desired discrimination threshold
+- confidence: the desired confidence,
+- epsilon: the allowable error bound for that confidence,
+- discrimination type: "group" or "causal".
+
+## Running Themis:
+
+The main entry point for Themis is `main.py`. It allows the user to run
+Themis via a configuration file (`settings.txt`). `main.py` uses `Themis.py`,
+which implements most of the Themis functionality.
+
+To run Themis, you need to do two things. You need to specify an input schema
+file (`settings.txt`) and modify `main.py` to specify which discrimination
+type to compute.
+
+### Input schema
+
+Themis needs to know how to run the software being tested and the input
+schema for the legal inputs to the software. The `settings.txt` consists of
+the number of input characteristics, a description for each characteristic,
+and the command to run the software. Because Themis requires a particular
+command-line format, it is likely to require writing a simple wrapper around
+the software under test.
+
+Refer to this example `settings.txt` file:
+```
+2
+1 race categorical green purple
+2 age continuousInt 18,120
+command: python loan.py
+name: LoanSoftware
+```
+
+The first line of `settings.txt` is the number of input characteristics the
+software requires. It is followed by one attribute per line, each containing
+space-separated number, name, type, and finally the set of possible
+valuations.
 
-##Structure of folder :
+The attribute number and name must be unique. There are two supported
+characteristic types: categorical and continuousInt. Categorical types list
+all possible characteristic valuations, whereas continuousInt types list the
+(comma-separated) minimum and maximum integer values the characteristic can
+take on.
 
-The Themis.py file has the class file defined for Themis and the different functions which can be used to test the software.
+Next, `settings.txt` includes the executable part of the command to run
+the software, preceded by `command:`.
 
-The main.py file is a helper which reads all the attributes and the command used to run the software from the settings file. It then parses the settings file to create an instance of Themis. Once this instance is created, any function called will test the given software.
-——————————————————————————————————————————————————————
+Finally, `settings.txt` includes a name for the software, preceded by
+`name:`. Note that the name is not used in executing the software, but only
+to refer to the software when reporting results.
 
-##The functions discussed in paper : 
+Themis expects the software to run using the command executable, followed by
+a combination of characteristic name and value pairs. For example, for the
+above `settings.txt`, Themis may execute the following command:
+```
+python loan.py race green age 18
+```
+and expects a binary output in the form of 0 or 1 printed to standard output.  
 
-Causal Discrimination : 
-Takes the characteristic subset to be tested, the confidence and epsilon as input and outputs the causal discrimination score
+### Specifying what to measure
 
+There are two ways to use Themis. First, given a set of input characteristics
+and an acceptable error bound, Themis can compute the *group* and the
+*causal* discrimination scores for those input characteristics. Second, given
+a discrimination threshold and an acceptable error bound, Themis can compute
+all characteristics with respect to which the software discriminates at least
+as much as the threshold. To make these computations, Themis generates test
+suites.
 
-Group Discrimination :
-Takes the characteristic subset to be tested, the confidence and epsilon as input and outputs the group discrimination score
+To use Themis, one creates a `main.py` script  out of a combination of the following give commands:
+```
+causalDiscrimination(..)
+groupDiscrimination(..)
+discriminationSearch(..)
+printSoftwareDetails()
+getTestSuite
+```
+---
 
+We now describe the five commands. 
 
-discriminationSearch :
-Takes theta, confidence, epsilon and type as input.
-    Theta is the threshold to test the discrimination of software i.e. if discriminations score > theta then the software discriminates.
-    type = 0 means to test group discrimination
-    type = 1 means to test causal discrimination
+* `causalDiscrimination(characteristics, confidence, errorBound)`
 
-——————————————————————————————————————————————————————
+The `characteristics` argument is a list of comma-separated names of the
+input characteristics whose causal discrimination is to be measured. 
 
-##How to run :
+The `confidence` and `errorBound` arguments are each a number between 0 and 1.
 
-1) Change the settings.txt file according to the input attributes according to the description of the file given below this section.
+Example use: `causalDiscrimination({race, age}, 0.99, 0.01})` returns the
+causal discrimination score with respect to race and age that is within 1% of
+the true causal discrimination score with confidence at least 99%.
 
-2) Add the function calls in the file main.py as per the need described below :
+* `groupDiscrimination(characteristics, confidence, errorBound)`
 
-a) <i>Search the discriminating set of attributes</i> : The function discriminationSearch tests the software for discrimination and returns all characteristic subsets which have discrimination score more than the threshold.
+The `characteristics` argument is a list of comma-separated names of the
+input characteristics whose group discrimination is to be measured. 
 
-Example input : software.discriminationSearch(0.1,99,0.1,0)
-Here the threshold = 0.1, confidence needed = 99%, epsilon/error tolerated = 0.1 = 10%, type = 0 means to test group fairness
+The `confidence` and `errorBound` arguments are each a number between 0 and 1.
 
-b) <i>Group discrimination </i>: The function to be called is groupDiscrimination which takes the following arguments :
+Example use: `groupDiscrimination({race, age}, 0.99, 0.01})` returns the
+group discrimination score with respect to race and age that is within 1% of
+the true group discrimination score with confidence at least 99%.
 
-A list X : which contains the attribute indices against which discrimination is tested, confidence and epsilon/error.
+* `discriminationSearch(discriminationThreshold, confidence, errorBound, discriminationType)`
 
-eg. X=[0,1] means the first and the second attributes are to be used. 
-groupDiscrimination(X,99,0.1) will call this function with confidence = 99% and epsilon = 0.1
+The `discriminationThreshold`, `confidence`, and `errorBound` arguments are
+each a number between 0 and 1.
 
-c) <i>Causal discrimination</i> : The function to be called is groupDiscrimination which takes the following arguments :
+The `discriminationType` argument can be one of "causal", "group", or "causalandgroup".
 
-A list X : which contains the attribute indices against which discrimination is tested, confidence and epsilon/error.
+Example use: `discriminationSearch(0.1, 0.99, 0.01, causalandgroup)` returns
+all characteristics such that either the causal or the group discrimination
+score is between 9% and 11% (10% \pm 1%) with confidence of at least 99%.
 
-eg. X=[0,1] means the first and the second attribute are to be used.
+* `printSoftwareDetails()`
 
-causalDiscrimination(X,99,0.1) will call this function with confidence = 99% and epsilon = 0.1
+Prints the input scema for the software.
 
-d) <i>Print the software details</i> : The function printSoftwareDetails prints the software details, the set of input attributes and the values it can take. It takes no arguments.
+* `getTestSuite()`
 
-e) <i> Get the test suite</i> : The function getTestSuite can be called after running discrimination functions listes in (a) or (b) or (c) above to print the test suite which has been generated in the current of the code. It returns a list of various inputs which were used to test the software.
+Must be called after a discrimination-computing function
+(`causalDiscrimination`, `groupDiscrimination`, or `discriminationSearch`).
+Prints the test suite used for the last discrimination-computing function.  
 
+## Subject systems
 
-Note : Example usages have been commented in main.py for reference. Confidence can take values 80, 90, 95, 98 and 99%
+The evaluation in [1] applied Themis to eight subject software systems (named
+A-H), trained in different ways, for a total of twenty different software
+system instances. The `subjectSystems/` folder contains the code for these
+subject systems.
 
-——————————————————————————————————————————————————————
+`A/` Discrimination-aware logistic regression [2] and Themis wrapper scripts for executing it.
 
-##Settings file (Input schema) description : 
+`B/` Discrimination-aware decision tree classifier [3] and Themis wrapper scripts for executing it.
 
-It should contain the input schema which consists of the number of attributes, attribute description, software name and the command to run the software.
+`C/` Discrimination-aware naive Bayes classifier [4] and Themis wrapper scripts for executing it.
 
-The first line contains the number of attributes the software takes.
-It is followed by one attribute per line.
-Each line for attribute contains the attribute number, followed by attribute name, followed by type of attribute followed by the values it can take. All these are separated by space.
+`D/` Discrimination-aware decision tree classifier [5] and Themis wrapper scripts for executing it.
 
-The type of attribute will be categorical for the categorical variables eg. sex which takes values male or female.
-If a variable can take continuous integers then the type will be continuousInt. It is represented by the start and end of the range of values 
-eg. a line  "2 Age continuousInt 2,6" (ignore the ") means that Age can take continuous values starting from 2 till 6 i.e. {2,3,4,5,6}
+`fairness_unaware/` Four standard discrimination-unaware classifiers,
+described as systems E (naive Bayes), F (decision tree), G (logistic
+regression), and H (support vector machines) in [1].
 
-The command should be given in a new line starting with "command:"
+## Collaborators
 
-Themis assumes that a software can be run as "`<Command>` `<space separated input attributes>`"
-eg. In the demo Themis calls the software as "python software.py Male 3 Red 4" which means that the input sex = Male, Age = 3, Race = Red and Income = 4 as per the specifications of settings file.
+[Sainyam Galhotra](http://people.cs.umass.edu/~sainyam/)
 
-The name should also be given in a new line starting with "name:"
+[Yuriy Brun](http://people.cs.umass.edu/~brun/)
 
+[Alexandra Meliou](http://people.cs.umass.edu/~ameli/)
 
+## Funding
+This work is supported by the National Science Foundation under grants no.
+CCF-1453474, IIS-1453543, and CNS-1744471.
 
-——————————————————————————————————————————————————————
+## References 
 
-##SAMPLE DEMO : 
+[1] Sainyam Galhotra, Yuriy Brun, and Alexandra Meliou, Fairness Testing:
+Testing Software for Discrimination, in European Software Engineering
+Conference and ACM SIGSOFT Symposium on the Foundations of Software
+Engineering (ESEC/FSE), pages 498-510, Paderborn, Germany, September 2017.
 
-You can run python main.py with settings.txt and software.py .
+[2] Muhammad Bilal Zafar, Isabel Valera, Manuel Gomez Rodriguez, and Krishna
+P. Gummadi. Learning fair classifiers. CoRR, abs/1507.05259, 2015.
 
-It will output the following :
+[3] Faisal Kamiran, Toon Calders, and Mykola Pechenizkiy. Discrimination
+aware decision tree learning. In International Conference on Data Mining
+(ICDM), pages 869-874, Sydney, Australia, December 2010.
 
+[4] Toon Calders, Faisal Kamiran, and Mykola Pechenizkiy. Building
+classifiers with independency constraints. In Proceedings of the 2009 IEEE
+International Conference on Data Mining (ICDM) Workshops, pages 13-18, Miami,
+FL, USA, December 2009.
 
-Software Name is   SexistSoftware 
+[5] Indre Zliobaite, Faisal Kamiran, and Toon Calders. Handling conditional
+discrimination. In International Conference on Data Mining (ICDM), pages
+992-1001, Vancouver, BC, Canada, December 2011.
 
-Number of attributes are  4 
 
-Attribute name is  Sex
-Number of values taken by this attribute = 2
-
-The different values taken are  ['Male', 'Female'] 
-
-Attribute name is  Age
-Number of values taken by this attribute = 5
-
-The different values taken are  [2, 3, 4, 5, 6] 
-
-Attribute name is  Race
-Number of values taken by this attribute = 4
-
-The different values taken are  ['Red', 'Green', 'Yellow', 'Purple'] 
-
-Attribute name is  Income
-Number of values taken by this attribute = 4
-
-The different values taken are  [2, 3, 4, 5] 
-
-
-
-
-Themis has completed 
-
-Software discriminates against  [['Sex'], ['Race']] 
-
-——————————————————————————————————————————————————————
-
-The output above shows the different attributes and the discriminating ones.
-
-
-——————————————————————————————————————————————————————
-
-##Code in subjectSystems folders : 
-
-Different folders are : 
-
-A = Code for [1] along with themis scripts running over it.
-
-B = Folder contains the decision tree classifier code for [2] 
-
-C,D  = Folder containing the code for [3] and [4] respectively.
-
-fairness_unaware = Folder containing the code for fairness unaware algorithms. These algorithms correspond to systems E,G,H described in our paper.
-
-    Here E = Naive Bayes
-         F = Decision Tree
-         G = Logistic Regression
-         H = Support Vector Machine
-
-
-##References 
-
-[1] Muhammad Bilal Zafar, Isabel Valera, Manuel Gomez Rodriguez, and Krishna P Gummadi. Learning fair classifiers. CoRR, abs/1507.05259, 2015.
-
-[2] Faisal Kamiran, Toon Calders, and Mykola Pechenizkiy. Discrimination aware decision tree learning. In International Conference on Data Mining (ICDM), pages 869–874, Sydney, Australia, December 2010.
-
-[3] Toon Calders, Faisal Kamiran, and Mykola Pechenizkiy. Building classifiers with independency constraints. In Proceedings of the 2009 IEEE International Conference on Data Mining (ICDM) Workshops, pages 13–18, Miami, FL, USA, December 2009.
-
-[4] Indre Zliobaite, Faisal Kamiran, and Toon Calders. Handling conditional discrimination. In International Conference on Data Mining (ICDM), pages 992–1001, Vancouver, BC, Canada, December 2011.

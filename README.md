@@ -209,14 +209,14 @@ regression), and H (support vector machines) in [1].
 ## Collaborators
 <table border=0>
 <tr>
-<td><a href='http://people.cs.umass.edu/~sainyam/'><img src='http://people.cs.umass.edu/~sainyam/sainyam.jpg' alt='Sainyam Galhotra' height='100' /></a></td>
+<td><a href='http://people.cs.umass.edu/~sainyam/'><img src='http://people.cs.umass.edu/~sainyam/sainyam.jpg' alt='Sainyam Galhotra' height='100' /></a><br/></td>
 <td><a href='http://people.cs.umass.edu/~brun/'><img src='http://people.cs.umass.edu/~brun/images/yuriy.jpg' alt='Yuriy Brun' height='100' /></a></td>
 <td><a href='http://people.cs.umass.edu/~ameli/'><img src='http://people.cs.umass.edu/~ameli/images/alexandra.jpg' alt='Alexandra Meliou' height='100' /></a></td>
-</tr><tr>
-<td>[Sainyam Galhotra](http://people.cs.umass.edu/~sainyam/)</td>
+</tr><!-- <tr>
+<td></td>
 <td>[Yuriy Brun](http://people.cs.umass.edu/~brun/)</td>
 <td>[Alexandra Meliou](http://people.cs.umass.edu/~ameli/)</td>
-</tr></table>
+</tr> --></table>
 
 ## Funding
 This work is supported by the National Science Foundation under grants no.

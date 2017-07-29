@@ -207,11 +207,11 @@ described as systems E (naive Bayes), F (decision tree), G (logistic
 regression), and H (support vector machines) in [1].
 
 ## Collaborators
-<table border="0">
+<table border:none;>
 <tr>
 <td><a href='http://people.cs.umass.edu/~sainyam/'><img src='http://people.cs.umass.edu/~sainyam/sainyam.jpg' alt='Sainyam Galhotra' height='100' /><br/>Sainyam Galhotra</a></td>
 <td><a href='http://people.cs.umass.edu/~brun/'><img src='http://people.cs.umass.edu/~brun/images/yuriy.jpg' alt='Yuriy Brun' height='100' /><br/>Yuriy Brun</a></td>
-<td><center><a href='http://people.cs.umass.edu/~ameli/'><img src='http://people.cs.umass.edu/~ameli/images/alexandra.jpg' alt='Alexandra Meliou' height='100' /></center><br/>Alexandra Meliou</a></td>
+<td><center><a href='http://people.cs.umass.edu/~ameli/'><img src='http://people.cs.umass.edu/~ameli/images/alexandra.jpg' alt='Alexandra Meliou' height='100' /></center><br/><center>Alexandra Meliou</center></a></td>
 </tr><!-- <tr>
 <td></td>
 <td>[Yuriy Brun](http://people.cs.umass.edu/~brun/)</td>

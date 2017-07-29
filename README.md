@@ -210,10 +210,11 @@ regression), and H (support vector machines) in [1].
 
 [Sainyam Galhotra](http://people.cs.umass.edu/~sainyam/)
 
-[(http://people.cs.umass.edu/~brun/images/yuriy.jpg)](http://people.cs.umass.edu/~brun/)
+
+<a href='http://people.cs.umass.edu/~brun/'><img src='http://people.cs.umass.edu/~brun/images/yuriy.jpg' alt='Yuriy Brun' height='100' /></a>
 [Yuriy Brun](http://people.cs.umass.edu/~brun/)
 
-![http://people.cs.umass.edu/~ameli/images/alexandra.jpg][http://people.cs.umass.edu/~ameli/]
+<a href='http://people.cs.umass.edu/~ameli/'><img src='http://people.cs.umass.edu/~ameli/images/alexandra.jpg' alt='Alexandra Meliou' height='100' /></a>
 [Alexandra Meliou](http://people.cs.umass.edu/~ameli/)
 
 ## Funding

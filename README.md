@@ -31,7 +31,7 @@ score with respect to race is 40%-30%=10%.
 
 However, group discrimination has two limitations. First, it may fail to
 observe some discrimination. Suppose the software discriminates against half
-the purple people, e.g., those who live in Greenville, but discriminates for
+the purple people, e.g., those who live in Greenville, but favors 
 the other half of the purple people, e.g., those who live in Purpleville.
 These two kinds of discrimination can cancel out and be hidden by the group
 discrimination score. Second, software may circumvent discrimination
@@ -100,7 +100,7 @@ type to compute.
 ### Input schema
 
 Themis needs to know how to run the software being tested and the input
-schema for the legal inputs to the software. The `settings.txt` consists of
+schema for the valid inputs to the software. The `settings.txt` consists of
 the number of input characteristics, a description for each characteristic,
 and the command to run the software. Because Themis requires a particular
 command-line format, it is likely to require writing a simple wrapper around
@@ -151,7 +151,7 @@ all characteristics with respect to which the software discriminates at least
 as much as the threshold. To make these computations, Themis generates test
 suites.
 
-To use Themis, one creates a `main.py` script  out of a combination of the following give commands:
+To use Themis, one creates a `main.py` script  out of a combination of the following five commands:
 ```
 causalDiscrimination(..)
 groupDiscrimination(..)
@@ -162,7 +162,7 @@ getTestSuite()
 
 We now describe the five commands. 
 
-* `causalDiscrimination(characteristics, confidence, errorBound)`
+#### `causalDiscrimination(characteristics, confidence, errorBound)`
 
 The `characteristics` argument is a list of comma-separated names of the
 input characteristics whose causal discrimination is to be measured. 
@@ -173,7 +173,7 @@ Example use: `causalDiscrimination({race, age}, 0.99, 0.01})` returns the
 causal discrimination score with respect to race and age that is within 1% of
 the true causal discrimination score with confidence at least 99%.
 
-* `groupDiscrimination(characteristics, confidence, errorBound)`
+#### `groupDiscrimination(characteristics, confidence, errorBound)`
 
 The `characteristics` argument is a list of comma-separated names of the
 input characteristics whose group discrimination is to be measured. 
@@ -184,7 +184,7 @@ Example use: `groupDiscrimination({race, age}, 0.99, 0.01})` returns the
 group discrimination score with respect to race and age that is within 1% of
 the true group discrimination score with confidence at least 99%.
 
-* `discriminationSearch(discriminationThreshold, confidence, errorBound, discriminationType)`
+#### `discriminationSearch(discriminationThreshold, confidence, errorBound, discriminationType)`
 
 The `discriminationThreshold`, `confidence`, and `errorBound` arguments are
 each a number between 0 and 1.
@@ -195,11 +195,11 @@ Example use: `discriminationSearch(0.1, 0.99, 0.01, causalandgroup)` returns
 all characteristics such that either the causal or the group discrimination
 score is between 9% and 11% (10% \pm 1%) with confidence of at least 99%.
 
-* `printSoftwareDetails()`
+#### `printSoftwareDetails()`
 
 Prints the input scema for the software.
 
-* `getTestSuite()`
+#### `getTestSuite()`
 
 Must be called after a discrimination-computing function
 (`causalDiscrimination`, `groupDiscrimination`, or `discriminationSearch`).

@@ -157,9 +157,8 @@ causalDiscrimination(..)
 groupDiscrimination(..)
 discriminationSearch(..)
 printSoftwareDetails()
-getTestSuite
+getTestSuite()
 ```
----
 
 We now describe the five commands. 
 

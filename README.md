@@ -54,19 +54,38 @@ identical in every way except for race, the software either gives both of
 them or neither of them the loan. The fraction of people for whom software
 causally discriminates is a measure of causal discrimination.
 
-Measuring causal and group discrimination scores each have three input
-parameters:
+## Why test software for discrimination?
 
-- set of input characteristics whose discrimination against to measure,
-- the desired confidence,
-- the allowable error bound for that confidence.
+Today, software determines who gets a loan or gets hired, computes
+risk-assessment scores that help decide who goes to jail and who is set free,
+and aids in diagnosing and treating medical patients. The increased role of
+software makes software fairness a critical property. Data-driven software
+has the ability to shape human behavior: it affects the products we view and
+purchase, the news articles we read, the social interactions we engage in,
+and, ultimately, the opinions we form. Biases in data and software risk
+forming and perpetuating biases in society. For example, prior work has
+demonstrated racial bias in online ad delivery systems, where online search
+for traditionally-minority names was more likely to yield ads related to
+arrest records. Such software behavior can contribute to racist stereotypes
+and other grave societal consequences.
 
-The `discriminationSearch` function has four inputs:
+While prior research has considered discrimination in software, Themis
+focuses on measuring causality in discrimination. Software testing allows
+Themis to perform hypothesis testing, such as "does changing a person's race
+affect whether the software recommends giving that person a loan?" This
+approach measures discrimination more accurately than prior work that focused
+on identifying differences in software output distributions, correlations, or
+mutual information between inputs and outputs.
 
-- theta: the desired discrimination threshold
-- confidence: the desired confidence,
-- epsilon: the allowable error bound for that confidence,
-- discrimination type: "group" or "causal".
+Software discrimination may occur unintentionally, e.g., because of
+algorithmic design errors, implementation bugs, emergent properties of
+component interactions, or automatically learned properties from biased data.
+Data-based decisions, such as those made by software relying on data mining
+or machine learning in particular, pose a serious challenge because the mined
+decision models are often not human readable. Themis uses software testing to
+find discrimination, whether it is intentional or unintentional. Themis' goal
+is to empower the stakeholders to better understand software behavior, judge
+when unwanted bias is present, and, ultimately, improve the software.
 
 ## Running Themis:
 

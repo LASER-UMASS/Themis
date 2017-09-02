@@ -5,8 +5,8 @@ system. For the best explanation of the underlying problem Themis solves,
 Themis algorithms, and an evaluation of Themis, read our paper [Fairness
 Testing: Testing Software for
 Discrimination](http://people.cs.umass.edu/~brun/pubs/pubs/Galhotra17fse.pdf).
- This work won an ACM Distinguished Paper Award at the ESEC/FSE 2017
-conference.
+This work won an ACM Distinguished Paper Award at the 
+[ESEC/FSE 2017](http://esec-fse17.uni-paderborn.de/) Conference.
 
 This repository contains Themis (in `Themis1.0/`), instructions for using
 Themis (this `README.md`), and subject systems on which Themis has been

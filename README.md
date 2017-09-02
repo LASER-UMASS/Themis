@@ -22,25 +22,25 @@ discrimination testing and Themis. Our interview will also soon air on the
 German Public Radio Deutschlandfunk [Computer und
 Kommunikation](http://www.deutschlandfunk.de/computer-und-kommunikation.683.de.html) segment.
 
-* [Unlearning Racism and Sexism in Learning Machines, in EnterpriseTech]
-(https://www.enterprisetech.com/2017/08/31/unlearning-racism-sexism-learning-machines/), 
+* [Unlearning Racism and Sexism in Learning Machines, in 
+EnterpriseTech](https://www.enterprisetech.com/2017/08/31/unlearning-racism-sexism-learning-machines/), 
 August 31, 2017.
 
-* [Look Who's Fighting Our Algorithmic Overlords, in Bloomberg]
-(https://www.bloomberg.com/view/articles/2017-08-30/look-who-s-fighting-our-algorithmic-overlords),
+* [Look Who's Fighting Our Algorithmic Overlords, in 
+Bloomberg](https://www.bloomberg.com/view/articles/2017-08-30/look-who-s-fighting-our-algorithmic-overlords),
 August 30, 2017.
 
 * [Uncovering discrimination in machine-learning software, in 
 GCN](https://gcn.com/articles/2017/08/25/software-bias.aspx), 
 August 25, 2017
 
-* [This Breakthrough Tool Detects Racism And Sexism In Software, in Co.Design]
-(https://www.fastcodesign.com/90137322/is-your-software-secretly-racist-this-new-tool-can-tell),
+* [This Breakthrough Tool Detects Racism And Sexism In Software, in 
+Co.Design](https://www.fastcodesign.com/90137322/is-your-software-secretly-racist-this-new-tool-can-tell),
 August 22, 2017.
 
 * [UMass Amherst Computer Scientists Develop New Technique to Measure Social
-  Bias in Software, UMass Press Release]
-(http://www.umass.edu/newsoffice/article/umass-amherst-computer-scientists-develop), August 14, 2017
+  Bias in Software, UMass Press 
+  Release](http://www.umass.edu/newsoffice/article/umass-amherst-computer-scientists-develop), August 14, 2017
 
 
 ## Measuring Discrimination 

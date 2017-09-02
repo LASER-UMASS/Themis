@@ -45,9 +45,8 @@ August 22, 2017.
 We also appeared in the [ACM
 News](http://technews.acm.org/archives.cfm?fo=2017-08-aug/aug-21-2017.html)
 on August 21, 2017, and the [MIT Technology
-Download](http://mailchi.mp/technologyreview/the-download-mainstream-metal-pri
-nting-old-nuclears-bad-news-and-trumps-mars-madness-757345?e=13bf7860c1) on
-August 24, 2017.
+Download](http://mailchi.mp/technologyreview/the-download-mainstream-metal-printing-old-nuclears-bad-news-and-trumps-mars-madness-757345?e=13bf7860c1) 
+on August 24, 2017.
 
 ## Measuring Discrimination 
 

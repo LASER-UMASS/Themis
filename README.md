@@ -9,8 +9,11 @@ This work won an ACM Distinguished Paper Award at the
 [ESEC/FSE 2017](http://esec-fse17.uni-paderborn.de/) Conference.
 
 This repository contains Themis (in `Themis1.0/`), instructions for using
-Themis (this `README.md`), and subject systems on which Themis has been
-evaluated (`subjectSystems/`).
+Themis (this `README.md`), a replication package to replicate the experiments
+presented in the ESEC/FSE 2017 paper (in
+`ESEC.FSE.2017.Experimental.Replication`) with its own
+[`README.md`](https://github.com/LASER-UMASS/Themis/tree/master/ESEC.FSE.2017.Experimental.Replication), 
+and subject systems on which Themis has been evaluated (`subjectSystems/`).
 
 ## Measuring Discrimination 
 

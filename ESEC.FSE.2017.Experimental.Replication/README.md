@@ -9,7 +9,7 @@ theoretical result.)
 
 ## Requirements
 
-The code has been tested with Python v.2.7 and associated libraries for that
+The code has been tested with Python v2.7 and associated libraries for that
 version of Python. This describes both our code's dependencies, and the
 dependencies of the underlying subject system our code uses in the evaluation.
 

@@ -30,7 +30,7 @@ August 30, 2017.
 
 * [Uncovering discrimination in machine-learning software, in 
 GCN](https://gcn.com/articles/2017/08/25/software-bias.aspx), 
-August 25, 2017
+August 25, 2017.
 
 * [This Breakthrough Tool Detects Racism And Sexism In Software, in 
 Co.Design](https://www.fastcodesign.com/90137322/is-your-software-secretly-racist-this-new-tool-can-tell),
@@ -38,7 +38,7 @@ August 22, 2017.
 
 * [UMass Amherst Computer Scientists Develop New Technique to Measure Social
   Bias in Software, UMass Press 
-  Release](http://www.umass.edu/newsoffice/article/umass-amherst-computer-scientists-develop), August 14, 2017
+  Release](http://www.umass.edu/newsoffice/article/umass-amherst-computer-scientists-develop), August 14, 2017.
 
 * [Kann Software rassistisch 
 sein?](http://www.deutschlandfunk.de/testprogramm-themis-kann-software-rassistisch-sein.684.de.html?dram:article_id=395507)

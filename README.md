@@ -18,9 +18,7 @@ and subject systems on which Themis has been evaluated (`subjectSystems/`).
 ## Recent News Coverage
 
 Several recent news articles have been published about our work on
-discrimination testing and Themis. Our interview will also soon air on the
-German Public Radio Deutschlandfunk [Computer und
-Kommunikation](http://www.deutschlandfunk.de/computer-und-kommunikation.683.de.html) segment.
+discrimination testing and Themis. 
 
 * [Unlearning Racism and Sexism in Learning Machines, in 
 EnterpriseTech](https://www.enterprisetech.com/2017/08/31/unlearning-racism-sexism-learning-machines/), 
@@ -41,6 +39,11 @@ August 22, 2017.
 * [UMass Amherst Computer Scientists Develop New Technique to Measure Social
   Bias in Software, UMass Press 
   Release](http://www.umass.edu/newsoffice/article/umass-amherst-computer-scientists-develop), August 14, 2017
+
+* [Kann Software rassistisch 
+sein?](http://www.deutschlandfunk.de/testprogramm-themis-kann-software-rassistisch-sein.684.de.html?dram:article_id=395507)
+Our interview on the German Public Radio Deutschlandfunk [Computer und 
+Kommunikation](http://www.deutschlandfunk.de/computer-und-kommunikation.683.de.html) segment, September 9, 2017. (In German.)
 
 We also appeared in the [ACM
 News](http://technews.acm.org/archives.cfm?fo=2017-08-aug/aug-21-2017.html)

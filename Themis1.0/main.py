@@ -19,13 +19,15 @@ for line in f :
     count = count + 1;	
     line = line.strip()
     if(count==1):
-        nums = int(line[0]) 
+	line = line.strip(':')
+        nums = int(line[-1]) 
     if( "command" in line and count==nums+2):
         line = line.split(" ")
         command  = " ".join(line[1:])
         continue
     if(num_attributes==-1):
-        num_attributes = int(line)
+	line = line.strip(':')
+        num_attributes = int(line[-1]) 
     else:
         line = line.split(' ')
         attr_no = int(line[0])-1

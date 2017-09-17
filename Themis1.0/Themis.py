@@ -17,16 +17,13 @@ class soft:
     SamplingThreshold = 10
     cache = {}
 
-    def __init__(self, name, names, values, num, command, type):
-        self.name = name
+    def __init__(self, names, values, num, command, type):
         self.attr_names = names
         self.values = values
         self.num = num
         self.type = type
         self.command = command
     
-    def getSoftwareName(self):
-        return self.name
     
     def getValues(self):
         return self.values
@@ -50,7 +47,6 @@ class soft:
                 return self.values[index]
 
     def printSoftwareDetails(self):
-        print "Software Name is ", self.name,"\n"
         print "Number of attributes are ", len(self.attr_names),"\n"
         i=0
         while i<len(self.attr_names):

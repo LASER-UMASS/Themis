@@ -4,4 +4,3 @@
 3 Race categorical Red,Green,Yellow,Purple
 4 Income continuousInt 2,5
 command: python software.py
-name: SexistSoftware

@@ -24,10 +24,6 @@ for line in f :
         line = line.split(" ")
         command  = " ".join(line[1:])
         continue
-    if( "name" in line and count==nums+3):
-        line = line.split(":")
-        software_name  = " ".join(line[1:])
-        continue
     if(num_attributes==-1):
         num_attributes = int(line)
     else:
@@ -52,7 +48,7 @@ for line in f :
 
 
 
-soft = Themis.soft( software_name, names, values, num_values, command, type)
+soft = Themis.soft(names, values, num_values, command, type)
 
 
 

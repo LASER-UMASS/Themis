@@ -92,7 +92,7 @@ def groupDiscrimination (self, X, confidence, epsilon):
             
             if r > self.SamplingThreshold:
                 #print confidence, self.conf_zValue
-                if (self.conf_zValue[int(confidence)] * math.sqrt(p*(1-p)*1.0/r) < epsilon):
+                if (self.conf_zValue[int(100*confidence)] * math.sqrt(p*(1-p)*1.0/r) < epsilon):
                     break
             #Add to cache
 

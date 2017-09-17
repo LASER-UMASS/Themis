@@ -118,9 +118,9 @@ class soft:
                 if(found):
                     continue
                 if("group" in type):
-                    score = self.groupDiscrimination(list(X),99,0.1)
+                    score = self.groupDiscrimination(list(X),confidence,epsilon)
                 elif("causal" in type):
-                    score = self.causalDiscrimination(list(X),99,0.1)
+                    score = self.causalDiscrimination(list(X),confidence,epsilon)
                 if(score > theta):
                     D.append(list(X))
     

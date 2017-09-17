@@ -52,7 +52,7 @@ def causalDiscrimination (self, X, confidence, epsilon):
         
         if r > self.SamplingThreshold:
             p = count*1.0/r
-            if (self.conf_zValue[int(confidence)] * math.sqrt(p*(1-p)*1.0/r) < epsilon):
+            if (self.conf_zValue[int(100*confidence)] * math.sqrt(p*(1-p)*1.0/r) < epsilon):
                 break
         if(found_in):
             count+=1

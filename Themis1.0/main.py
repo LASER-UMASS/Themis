@@ -55,7 +55,7 @@ soft = Themis.soft(names, values, num_values, command, type)
 
 
 
-D = soft.discriminationSearch(0.3,0.99,0.1,"group")
+D = soft.discriminationSearch(0.3,0.99,0.1,"groupandcausal")
 
 soft.printSoftwareDetails()
 

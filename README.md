@@ -147,7 +147,7 @@ the software under test.
 
 Refer to this example `settings.txt` file:
 ```
-2
+number of input characteristics: 2
 1 race categorical green purple
 2 age continuousInt 18,120
 command: python loan.py

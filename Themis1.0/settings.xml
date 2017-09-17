@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<settings>
+    <name>SexistSoftware</name>
+    <command>python software.py</command>
+    <inputs>
+        <input>
+            <name>Sex</name>
+            <type>categorical</type>
+            <values>
+                <value>Male</value>
+                <value>Female</value>
+            </values>
+        </input>
+        <input>
+            <name>Age</name>
+            <type>continuousInt</type>
+            <bounds>
+                <lowerbound>2</lowerbound>
+                <upperbound>6</upperbound>
+            </bounds>
+        </input>
+        <input>
+            <name>Race</name>
+            <type>categorical</type>
+            <values>
+                <value>Red</value>
+                <value>Green</value>
+                <value>Yellow</value>
+                <value>Purple</value>
+            </values>
+        </input>
+        <input>
+            <name>Income</name>
+            <type>continuousInt</type>
+            <bounds>
+                <lowerbound>2</lowerbound>
+                <upperbound>5</upperbound>
+            </bounds>
+        </input>
+    </inputs>
+</settings>

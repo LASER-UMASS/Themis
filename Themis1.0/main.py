@@ -2,7 +2,6 @@ import math
 import random
 import sys
 import xml.etree.ElementTree as ET
-
 import Themis
 
 def load_soft_from_settings():
@@ -34,13 +33,14 @@ def load_soft_from_settings():
 
 
 if __name__ == '__main__':
+    random.seed(42)
     soft = load_soft_from_settings()
-    D = soft.discriminationSearch(0.3,99,0.1,"group")
-    soft.printSoftwareDetails()
+    D = soft.discriminationSearch(0.3,0.99,0.1,"groupandcausal")
+    #soft.printSoftwareDetails()
 
-    print  "\n\n\nThemis has completed \n"
-    print "Software discriminates against ",D,"\n"
+    #print  "\n\n\nThemis has completed \n"
+    print "Software discriminates against ", D
     #X=[0,2]
     #print soft.groupDiscrimination(X,99,0.1)
     #print soft.causalDiscrimination(X,99,0.1)
-    print soft.getTestSuite()
+    #print soft.getTestSuite()

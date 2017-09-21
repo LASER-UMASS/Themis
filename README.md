@@ -147,11 +147,10 @@ the software under test.
 
 Refer to this example `settings.txt` file:
 ```
-2
+number of input characteristics: 2
 1 race categorical green purple
 2 age continuousInt 18,120
 command: python loan.py
-name: LoanSoftware
 ```
 
 The first line of `settings.txt` is the number of input characteristics the
@@ -167,10 +166,6 @@ take on.
 
 Next, `settings.txt` includes the executable part of the command to run
 the software, preceded by `command:`.
-
-Finally, `settings.txt` includes a name for the software, preceded by
-`name:`. Note that the name is not used in executing the software, but only
-to refer to the software when reporting results.
 
 Themis expects the software to run using the command executable, followed by
 a combination of characteristic name and value pairs. For example, for the

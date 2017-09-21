@@ -2,6 +2,7 @@
 <settings>
     <name>SexistSoftware</name>
     <command>python software.py</command>
+    <seed>42</seed>
     <inputs>
         <input>
             <name>Sex</name>

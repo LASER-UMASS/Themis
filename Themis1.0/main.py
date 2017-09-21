@@ -16,6 +16,7 @@ def load_soft_from_settings():
     software_name = root.find("name").text
     command = root.find("command").text
     inputs = root.find("inputs")
+    random.seed(int(root.find("seed").text))
 
     for uid, obj in enumerate(inputs.findall("input")):
         names[uid] = obj.find("name").text
@@ -33,9 +34,8 @@ def load_soft_from_settings():
 
 
 if __name__ == '__main__':
-    random.seed(42)
     soft = load_soft_from_settings()
-    D = soft.discriminationSearch(0.3,0.99,0.1,"groupandcausal")
+    D = soft.discriminationSearch(0.2,0.99,0.1,"groupandcausal")
     #soft.printSoftwareDetails()
 
     #print  "\n\n\nThemis has completed \n"

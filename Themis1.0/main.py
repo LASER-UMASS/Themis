@@ -36,7 +36,7 @@ def load_soft_from_settings():
 if __name__ == '__main__':
     soft = load_soft_from_settings()
     D = soft.discriminationSearch(0.2,0.99,0.1,"groupandcausal")
-    #soft.printSoftwareDetails()
+    soft.printSoftwareDetails()
 
     #print  "\n\n\nThemis has completed \n"
     print "Software discriminates against ", D

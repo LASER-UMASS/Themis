@@ -28,13 +28,11 @@ class soft:
     def getAttributeNames(self):
         return self.attr_names
 
-    #Get the number of values that a particular attribute can take
     def getRange(self, attr_name):
         for index,att_name in self.attr_names.iteritems():
             if(att_name == attr_name):
                 return self.num[index]
 
-    #Gets the different values a particular attribute can take
     def getValues(self, attr_name):
         for index,att_name in self.attr_names.iteritems():
             if(att_name == attr_name):
@@ -42,14 +40,18 @@ class soft:
 
     def printSoftwareDetails(self):
         print "Number of attributes are ", len(self.attr_names),"\n"
-        i=0
-        while i<len(self.attr_names):
-            print "Attribute name is ",self.attr_names[i]
-            print "Number of values taken by this attribute =",self.getRange(self.attr_names[i])
-            print "The different values taken are ",self.getValues(self.attr_names[i]),"\n"
-            i+=1
+        for attr_name in self.attr_names:
+            print "Attribute name is ",attr_name
+            print "Number of values taken by this attribute =",self.getRange(attr_name)
+            print "The different values taken are ",self.getValues(attr_name),"\n"
+
 
     def randomInput (self, I, X, attr):
+        print I
+        print X
+
+        exit()
+
         i=0
         inp = []
         while i < len(I):
@@ -217,11 +219,7 @@ class soft:
                 i+=1
             if(found):
                 count+=1
-                        
-
-
             r += 1
-        
         return p
 
 
@@ -249,9 +247,7 @@ class soft:
     def groupDiscrimination (self, X, confidence, epsilon):
         minGroup = float("inf")
         maxGroup = 0
-        
-        #first find the maximum number of assignments possible
-        #iterate
+
         numValues = 1
         for x in X:
             numValues *= self.num[x]
@@ -264,69 +260,41 @@ class soft:
                 continue
             maxPossible*=self.num[i]
             i+=1
-        #print maxPossible
         i=0
 
         while i < numValues:
-            #print i
-            #Convert i to the values for X
             attr = self.decodeValues(i,self.num,X)
-            #print "this is ",X, self.num,attr
-            #TODO: Check cache elements first
-            #        (tr,fal) = self.ProcessCache(X,attr)
-            #print tr,fal,attr,X
             tr = 0
             fal=0
             r = tr+fal
             count = tr
-            #print "cahce told ",tr,fal
             p=1
             added_now=[]
             while r <= self.MaxSamples:
-                #print r, maxPossible
-                
                 inp = self.randomInput(self.num,X,attr)
-                
                 if(tuple(inp) in self.cache.keys()):
-                    
                     out = self.cache[tuple(inp)]
-                    
                     if(r==maxPossible):
                         p = count*1.0/r
                         break
                     if(inp in added_now):
                         continue
-                            #                print inp,out
-
                 else:
-            #print "inp",attr,inp,r,self.MaxSamples,p
-                #Compute S(inp)
                     out = self.SoftwareTest(inp,self.num, self.values)
                     self.cache[tuple(inp)] = out
                 added_now.append(inp)
                 r+=1
-                #print inp,out
-                #
-
                 if out:
                     count += 1
                 p = count*1.0/r
-                
                 if r > self.SamplingThreshold:
-                    #print confidence, self.conf_zValue
                     if (self.conf_zValue[int(100*confidence)] * math.sqrt(p*(1-p)*1.0/r) < epsilon):
                         break
-                #Add to cache
-
-                #we need to check if the new inp is not generated in this loop. In that case we need to re generate the random input
-                #print p, maxGroup,minGroup
-            
             if(maxGroup < p):
                 maxGroup = p
             if(minGroup > p):
                 minGroup = p
             i+=1
-        #print maxGroup, minGroup
         return maxGroup - minGroup
 
 

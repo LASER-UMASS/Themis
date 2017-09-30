@@ -3,6 +3,7 @@ import itertools
 import commands
 import random
 import math
+import copy
 
 class soft:
     conf_zValue = {80:1.28,90:1.645,95:1.96, 98:2.33, 99:2.58}
@@ -12,12 +13,11 @@ class soft:
     cache = {}
 
     def __init__(self, names, values, num, command, type):
-        self.attr_names = names
-        self.values = values
-        self.num = num
-        self.type = type
-        self.command = command
-
+        self.attr_names = copy.deepcopy(names)
+        self.values = copy.deepcopy(values)
+        self.num = copy.deepcopy(num)
+        self.type = copy.deepcopy(type)
+        self.command = copy.deepcopy(command)
 
     def getValues(self):
         return self.values

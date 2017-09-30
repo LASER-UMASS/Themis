@@ -44,6 +44,8 @@ class Themis:
 
         random.seed(int(root.find("seed").text))
 
+        self.max_samples = 50
+        self.min_samples = 10
         self.software_name = root.find("name").text
         self.command = root.find("command").text.strip
         self._build_input_space(args=root.find("inputs"))
@@ -84,22 +86,6 @@ class Themis:
         """
         #TODO: make this general
         group_discrimination(field=["Race"])
-
-    def construct_inputs_and_run(self, assignment=None):
-        """
-        Run the software on the input `assignment`.
-
-        Parameters
-        ----------
-        assignment : dict
-            dictionary of all input assignments.
-
-        Returns
-        -------
-        str
-            "0" or "1", the output of the software.
-        """
-        pass
 
     def new_random_sub_input(self, args=[]):
         """
@@ -162,7 +148,7 @@ class Themis:
             return self.cache[tupled_args]
 
         cmd = self.command + " " + " ".join(tupled_args)
-        self.cache[tupled_args] = commands.getstatusoutput(cmd)[1]
+        self.cache[tupled_args] = commands.getoutput(cmd).strip
         return output
 
     def group_discrimination(self, fields=None, conf=0.99, margin=0.01):

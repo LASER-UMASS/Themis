@@ -2,16 +2,24 @@
 #
 # By: Rico Angell
 
+import random
 import scipy.stats as st
 
 
 class Input:
     """
     """
+
     def __init__(name=name, values=[]):
         self.name = name
         self.values = values
         self.num_values = len(values)
+
+    def get_random_input():
+        """
+        Return a random value from self.values
+        """
+        return random.choice(self.values)
 
 
 class Themis:
@@ -20,17 +28,46 @@ class Themis:
 
     def __init__(xml_fname=""):
         """
+        Initialize Themis from xml file.
+
+        Parameters
+        ----------
+        xml_fname : string
+            name of the xml file we want to import settings from.
         """
-        pass
+        assert xml_fname != ""
+
+        tree = ET.parse(xml_fname)
+        root = tree.getroot()
+
+        self.software_name = root.find("name").text
+        self.command = root.find("command").text
+
+        random.seed(int(root.find("seed").text))
+
+        inputs = []
+        args = root.find("inputs")
+        for uid, obj in enumerate(args.findall("input")):
+            name = obj.find("name").text
+            values = []
+            t = obj.find("type").text
+            if t == "categorical":
+                values = [elt.text for elt in obj.find("values").findall("value")]
+            elif types[uid] == "continuousInt":
+                values = range(int(obj.find("bounds").find("lowerbound").text),
+                               int(obj.find("bounds").find("upperbound").text))
+            else:
+                assert false
+            inputs.append(Input(name=name, values=values)
+
+        # TODO: Add parsing to run functions user requests
 
     def run():
         """
         Run Themis given the configuration.
         """
-        pass
-
-    def run_discrimination_test():
-        pass
+        #TODO: make this general
+        group_discrimination(field=["Race"])
 
     def construct_inputs_and_run(assignment=None):
         """
@@ -94,3 +131,6 @@ class Themis:
         """
         pass
 
+
+if __name__ == '__main__':
+    pass

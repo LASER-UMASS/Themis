@@ -2,6 +2,8 @@
 #
 # By: Rico Angell
 
+import commands
+import itertools
 import random
 import scipy.stats as st
 
@@ -40,13 +42,19 @@ class Themis:
         tree = ET.parse(xml_fname)
         root = tree.getroot()
 
-        self.software_name = root.find("name").text
-        self.command = root.find("command").text
-
         random.seed(int(root.find("seed").text))
 
-        inputs = []
-        args = root.find("inputs")
+        self.software_name = root.find("name").text
+        self.command = root.find("command").text.strip
+        self._build_input_space(args=root.find("inputs"))
+        self.cache = {}
+        # TODO: Add parsing to run functions user requests
+
+    def _build_input_space(self, args=None):
+        assert args != None
+        self.inputs = {}
+        self.input_order = []
+        args =
         for uid, obj in enumerate(args.findall("input")):
             name = obj.find("name").text
             values = []
@@ -58,18 +66,26 @@ class Themis:
                                int(obj.find("bounds").find("upperbound").text))
             else:
                 assert false
-            inputs.append(Input(name=name, values=values)
+            self.inputs[name] = Input(name=name, values=values)
+            self.input_order.append(name)
 
-        # TODO: Add parsing to run functions user requests
+    def _tuple(self, assignment=None):
+        assert assignment != None
+        return tuple(str(assignment[name]) for name in self.input_order)
 
-    def run():
+    def _untuple(self, tupled_args=None):
+        assert tupled_args != None
+        listed_args = list(tupled_args)
+        return {name : listed_args[idx] for idx, name in self.input_order}
+
+    def run(self):
         """
         Run Themis given the configuration.
         """
         #TODO: make this general
         group_discrimination(field=["Race"])
 
-    def construct_inputs_and_run(assignment=None):
+    def construct_inputs_and_run(self, assignment=None):
         """
         Run the software on the input `assignment`.
 
@@ -85,28 +101,44 @@ class Themis:
         """
         pass
 
-    def new_random_sub_input(attributes=[]):
+    def new_random_sub_input(self, args=[]):
         """
         Produce a random input for the each of the elements of `attributes`.
 
         Parameters
         ----------
         attributes : list of str
-            list of attribute names that we want random assignments to
+            list of attribute names that we want random assignments to.
 
         Returns
         -------
         dict
             the assignments to each of the attributes.
         """
-        pass
+        assert args
+        return {name : self.input[name].get_random_input() for name in args}
 
-    def gen_all_sub_inputs(attributes=[]):
+    def gen_all_sub_inputs(self, args=[]):
         """
-        """
-        pass
+        Produces a list of all possible assignments.
 
-    def get_test_result(assignment=None):
+        Parameters
+        ----------
+        attributes : list of str
+            list of attribute names that we want random assignments to.
+
+        Returns
+        -------
+        list of dict
+            list of the assignments.
+        """
+        assert args
+        vals_of_args = [self.inputs[arg].values for arg in args]
+        combos = [list(elt) for elt in list(itertools.product(*vals_of_args))]
+        return [{arg : elt[idx] for idx, arg in enumerate(args)} \
+                                                 for elt in combos]
+
+    def get_test_result(self, assignment=None):
         """
         Returns the output of the software with input `assignment`.
 
@@ -124,9 +156,16 @@ class Themis:
         str
             "0" or "1", the output of the software.
         """
-        pass
+        assert assignment != None
+        tupled_args = self._tuple(assignment)
+        if tupled_args in self.cache:
+            return self.cache[tupled_args]
 
-    def group_discrimination(fields=None, conf=0.99, margin=0.01):
+        cmd = self.command + " " + " ".join(tupled_args)
+        self.cache[tupled_args] = commands.getstatusoutput(cmd)[1]
+        return output
+
+    def group_discrimination(self, fields=None, conf=0.99, margin=0.01):
         """
         """
         pass

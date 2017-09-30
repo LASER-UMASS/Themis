@@ -43,4 +43,4 @@ if __name__ == '__main__':
     #X=[0,2]
     #print soft.groupDiscrimination(X,99,0.1)
     #print soft.causalDiscrimination(X,99,0.1)
-    #print soft.getTestSuite()
+    print soft.getTestSuite()

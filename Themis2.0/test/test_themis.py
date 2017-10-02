@@ -1,3 +1,4 @@
+from itertools import chain, combinations
 import pytest
 import themis
 
@@ -26,23 +27,23 @@ def test_get_test_result():
 
 def test_group_discrimination():
     t = themis.Themis(xml_fname="settings.xml")
-    _, p = t.group_discrimination(i_fields=["Sex", "Race"])
-    print "Sex and Race: ", p
-
-    _, p = t.group_discrimination(i_fields=["Race"])
-    print "Race: ", p
-
-    _, p = t.group_discrimination(i_fields=["Sex"])
-    print "Sex: ", p
+    print "\nGroup:"
+    for f in t._all_relevant_subs(["Sex", "Race", "Age", "Income"]):
+        _, p = t.group_discrimination(i_fields=f)
+        print f, "--> ", p
 
 def test_causal_discrimination():
     t = themis.Themis(xml_fname="settings.xml")
-    _, p = t.causal_discrimination(i_fields=["Sex", "Race"])
-    print "Sex and Race: ", p
+    print "\nCausal:"
+    for f in t._all_relevant_subs(["Sex", "Race", "Age", "Income"]):
+        _, p = t.causal_discrimination(i_fields=f)
+        print f, "--> ", p
 
-    _, p = t.causal_discrimination(i_fields=["Race"])
-    print "Race: ", p
+def test_discrimination_search():
+    t = themis.Themis(xml_fname="settings.xml")
+    group_subs, causal_subs = t.discrimination_search(group=True, causal=True)
+    print "\n"
+    print "Group: ", group_subs
+    print "Causal: ", causal_subs
 
-    _, p = t.causal_discrimination(i_fields=["Sex"])
-    print "Sex: ", p
 

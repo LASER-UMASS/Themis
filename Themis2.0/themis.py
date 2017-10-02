@@ -82,16 +82,6 @@ class Themis:
             self.inputs[name] = Input(name=name, values=values)
             self.input_order.append(name)
 
-    def _tuple(self, assign=None):
-        assert assign != None
-        return tuple(str(assign[name]) for name in self.input_order)
-
-    def _untuple(self, tupled_args=None):
-        assert tupled_args != None
-        listed_args = list(tupled_args)
-        return {name : listed_args[idx] \
-                    for idx, name in enumerate(self.input_order)}
-
     def run(self):
         """
         Run Themis given the configuration.
@@ -164,38 +154,7 @@ class Themis:
         self.cache[tupled_args] = (commands.getoutput(cmd).strip() == "1")
         return self.cache[tupled_args]
 
-    def _add_assignment(self, test_suite, assign):
-        if assign not in test_suite:
-            test_suite.append(assign)
-
-    def _all_other_fields(self, i_fields):
-        return [f for f in self.input_order if f not in i_fields]
-
-    def _end_condition(self, count, num_sampled, conf, margin):
-        p = 0
-        if num_sampled > self.min_samples:
-            p = count / num_sampled
-            error = st.norm.ppf(conf)*math.sqrt((p*(1-p))/num_sampled)
-            return p, error < margin
-        return p, False
-
-    def _merge_assignments(self, assign1, assign2):
-        merged = {}
-        merged.update(assign1)
-        merged.update(assign2)
-        return merged
-
-    def _all_relevant_subs(self, xs):
-        return chain.from_iterable(combinations(xs, n) \
-                                            for n in range(1, len(xs)))
-
-    def _is_subset(self, small, big):
-        for x in small:
-            if x not in big:
-                return False
-        return True
-
-    def group_discrimination(self, i_fields=None, conf=0.99, margin=0.01):
+    def group_discrimination(self, i_fields=None, conf=0.999, margin=0.0001):
         """
         Compute the group discrimination for characteristics `i_fields`.
 
@@ -237,7 +196,7 @@ class Themis:
 
         return test_suite, (max_group - min_group)
 
-    def causal_discrimination(self, i_fields=None, conf=0.99, margin=0.01):
+    def causal_discrimination(self, i_fields=None, conf=0.999, margin=0.0001):
         """
         Compute the causal discrimination for characteristics `i_fields`.
 
@@ -265,18 +224,15 @@ class Themis:
         for num_sampled in range(1, self.max_samples):
             fixed_assign = self.new_random_sub_input(args=f_fields)
             singular_assign = self.new_random_sub_input(args=i_fields)
-
             assign = self._merge_assignments(fixed_assign, singular_assign)
-
             self._add_assignment(test_suite, assign)
             result = self.get_test_result(assign=assign)
-
             for dyn_sub_assign in self.gen_all_sub_inputs(args=i_fields):
                 if dyn_sub_assign == singular_assign:
                     continue
-                fixed_assign.update(dyn_sub_assign)
+                assign.update(dyn_sub_assign)
                 self._add_assignment(test_suite, assign)
-                if self.get_test_result(assign=assign):
+                if self.get_test_result(assign=assign) != result:
                     count += 1
                     break
 
@@ -286,8 +242,95 @@ class Themis:
 
         return test_suite, p
 
-    def discrimination_search(self, threshold=0.3, conf=0.99, margin=0.01):
-        pass
+    def discrimination_search(self, threshold=0.2, conf=0.99, margin=0.01,
+                              group=False, causal=False):
+        """
+        Find all minimall subsets of characteristics that discriminate.
+
+        Choose to search by group or causally and set a threshold for
+        discrimination.
+
+        Parameters
+        ----------
+        threshold : float in [0,1]
+            At least level of discrimination to be considered.
+        conf : float in [0, 1]
+            The z* confidence level (percentage of normal distribution.
+        margin : float in [0, 1]
+            The margin of error for the confidence.
+        group : bool
+            Search for group discrimination if `True`.
+        causal : bool
+            Search for causal discrimination if `True`.
+
+        Returns
+        -------
+        tuple of list of list - (group_subsets, causal_subsets)
+            The lists of subsets of the input characteristics that discriminate.
+        """
+        assert group or causal
+        group_d_subs, causal_d_subs = [], []
+        for sub in self._all_relevant_subs(self.input_order):
+            if self._supset(list(set(group_d_subs)|set(causal_d_subs)), sub):
+                continue
+            if group:
+                _, p = self.group_discrimination(i_fields=sub, conf=conf,
+                                                   margin=margin)
+                if p > threshold:
+                    group_d_subs.append(sub)
+            if causal:
+                _, p = self.causal_discrimination(i_fields=sub, conf=conf,
+                                                   margin=margin)
+                if p > threshold:
+                    causal_d_subs.append(sub)
+
+        return group_d_subs, causal_d_subs
+
+    def _all_relevant_subs(self, xs):
+        return chain.from_iterable(combinations(xs, n) \
+                                            for n in range(1, len(xs)))
+
+    def _supset(self, list_of_small, big):
+        for small in list_of_small:
+            next_subset = False
+            for x in small:
+                if x not in big:
+                    next_subset = True
+                    break
+            if not next_subset:
+                return True
+
+    def _add_assignment(self, test_suite, assign):
+        if assign not in test_suite:
+            test_suite.append(assign)
+
+    def _all_other_fields(self, i_fields):
+        return [f for f in self.input_order if f not in i_fields]
+
+    def _end_condition(self, count, num_sampled, conf, margin):
+        p = 0
+        if num_sampled > self.min_samples:
+            p = count / num_sampled
+            error = st.norm.ppf(conf)*math.sqrt((p*(1-p))/num_sampled)
+            return p, error < margin
+        return p, False
+
+    def _merge_assignments(self, assign1, assign2):
+        merged = {}
+        merged.update(assign1)
+        merged.update(assign2)
+        return merged
+        return False
+
+    def _tuple(self, assign=None):
+        assert assign != None
+        return tuple(str(assign[name]) for name in self.input_order)
+
+    def _untuple(self, tupled_args=None):
+        assert tupled_args != None
+        listed_args = list(tupled_args)
+        return {name : listed_args[idx] \
+                    for idx, name in enumerate(self.input_order)}
 
 
 if __name__ == '__main__':

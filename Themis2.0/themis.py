@@ -5,7 +5,7 @@
 from __future__ import division
 
 import commands
-import itertools
+from itertools import chain, combinations, product
 import math
 import random
 import scipy.stats as st
@@ -132,7 +132,7 @@ class Themis:
         """
         assert args
         vals_of_args = [self.inputs[arg].values for arg in args]
-        combos = [list(elt) for elt in list(itertools.product(*vals_of_args))]
+        combos = [list(elt) for elt in list(product(*vals_of_args))]
         return ({arg : elt[idx] for idx, arg in enumerate(args)} \
                                                  for elt in combos)
 
@@ -184,6 +184,16 @@ class Themis:
         merged.update(assign1)
         merged.update(assign2)
         return merged
+
+    def _all_relevant_subs(self, xs):
+        return chain.from_iterable(combinations(xs, n) \
+                                            for n in range(1, len(xs)))
+
+    def _is_subset(self, small, big):
+        for x in small:
+            if x not in big:
+                return False
+        return True
 
     def group_discrimination(self, i_fields=None, conf=0.99, margin=0.01):
         """
@@ -266,13 +276,18 @@ class Themis:
                     continue
                 fixed_assign.update(dyn_sub_assign)
                 self._add_assignment(test_suite, assign)
-                count += self.get_test_result(assign=assign)
+                if self.get_test_result(assign=assign):
+                    count += 1
+                    break
 
             p, end = self._end_condition(count, num_sampled, conf, margin)
             if end:
                 break
 
         return test_suite, p
+
+    def discrimination_search(self, threshold=0.3, conf=0.99, margin=0.01):
+        pass
 
 
 if __name__ == '__main__':

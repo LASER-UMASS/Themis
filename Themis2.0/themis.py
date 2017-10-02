@@ -36,6 +36,32 @@ class Input:
     __repr__ = __str__
 
 
+class Test:
+    """
+    """
+    def __init__(self, function="", i_fields=[], conf=0.999, margin=0.0001,
+                    group=False, causal=False, threshold=0.2):
+        self.function = function
+        self.i_fields = i_fields
+        self.conf = conf
+        self.margin = margin
+        self.group = group
+        self.causal = causal
+        self.threshold = threshold
+
+    def __str__(self):
+        s = "Test: " + self.function + "\n"
+        s += "Characteristics: " + ", ".join(self.i_fields) + "\n"
+        s += "Confidence: " + str(self.conf) + "\n"
+        s += "Margin: " + str(self.margin) + "\n"
+        s += "Threshold: " + str(self.threshold) + "\n"
+        s += "Group: " + str(self.group) + "\n"
+        s += "Causal: " + str(self.causal) + "\n"
+        return s
+
+    __repr__ = __str__
+
+
 class Themis:
     """
     """
@@ -61,14 +87,14 @@ class Themis:
         self.software_name = root.find("name").text
         self.command = root.find("command").text.strip()
         self._build_input_space(args=root.find("inputs"))
+        self._load_tests(args=root.find("tests"))
         self.cache = {}
-        # TODO: Add parsing to run functions user requests
 
     def _build_input_space(self, args=None):
         assert args != None
         self.inputs = {}
         self.input_order = []
-        for uid, obj in enumerate(args.findall("input")):
+        for obj in args.findall("input"):
             name = obj.find("name").text
             values = []
             t = obj.find("type").text
@@ -82,12 +108,53 @@ class Themis:
             self.inputs[name] = Input(name=name, values=values)
             self.input_order.append(name)
 
+    def _load_tests(self, args=None):
+        assert args != None
+        self.tests = []
+        for obj in args.findall("test"):
+            test = Test()
+            test.function = obj.find("function").text
+            if test.function == "causal_discrimination" or \
+               test.function == "group_discrimination":
+                test.i_fields = [elt.text 
+                        for elt in obj.find("i_fields").findall("input_name")]
+            if test.function == "discrimination_search":
+                test.group = bool(obj.findall("group"))
+                test.causal = bool(obj.findall("causal"))
+                test.threshold = float(obj.find("threshold").text)
+            test.conf = float(obj.find("conf").text)
+            test.margin = float(obj.find("margin").text)
+            self.tests.append(test)
+
     def run(self):
         """
         Run Themis given the configuration.
         """
-        #TODO: make this general
-        group_discrimination(field=["Race"])
+        for test in self.tests:
+            if test.function == "causal_discrimination":
+                suite, p = self.causal_discrimination(i_fields=test.i_fields,
+                                                      conf=test.conf,
+                                                      margin=test.margin)
+                print "\n"
+                print test
+                print "Score: ", p
+            elif test.function == "group_discrimination":
+                suite, p = self.group_discrimination(i_fields=test.i_fields,
+                                                     conf=test.conf,
+                                                     margin=test.margin)
+                print "\n"
+                print test
+                print "Score: ", p
+            elif test.function == "discrimination_search":
+                g, c = self.discrimination_search(threshold=test.threshold,
+                                                  conf=test.conf,
+                                                  margin=test.margin,
+                                                  group=test.group,
+                                                  causal=test.causal)
+                print "\n"
+                print test
+                print "Group: ", g
+                print "Causal: ", c
 
     def new_random_sub_input(self, args=[]):
         """
@@ -334,4 +401,5 @@ class Themis:
 
 
 if __name__ == '__main__':
-    pass
+    t = Themis(xml_fname="settings.xml")
+    t.run()

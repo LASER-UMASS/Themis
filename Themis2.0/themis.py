@@ -1,9 +1,10 @@
-# Themis2.0 main class
+# Themis 2.0
 #
 # By: Rico Angell
 
 from __future__ import division
 
+import argparse
 import commands
 from itertools import chain, combinations, product
 import math
@@ -410,5 +411,9 @@ class Themis:
 
 
 if __name__ == '__main__':
-    t = Themis(xml_fname="settings.xml")
+    parser = argparse.ArgumentParser(description="Run Themis.")
+    parser.add_argument("XML_FILE", type=str, nargs=1,
+                            help="XML configuration file")
+    args = parser.parse_args()
+    t = Themis(xml_fname=args.XML_FILE[0])
     t.run()

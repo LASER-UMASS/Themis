@@ -80,8 +80,8 @@ class Themis:
         tree = ET.parse(xml_fname)
         root = tree.getroot()
 
-        self.max_samples = int(root.find("max_samples")
-        self.min_samples = int(root.find("min_samples")
+        self.max_samples = int(root.find("max_samples").text)
+        self.min_samples = int(root.find("min_samples").text)
         self.rand_seed = int(root.find("seed").text)
         self.software_name = root.find("name").text
         self.command = root.find("command").text.strip()
@@ -131,18 +131,17 @@ class Themis:
         """
         for test in self.tests:
             random.seed(self.rand_seed)
+            print "--------------------------------------------------"
             if test.function == "causal_discrimination":
                 suite, p = self.causal_discrimination(i_fields=test.i_fields,
                                                       conf=test.conf,
                                                       margin=test.margin)
-                print "\n"
                 print test
                 print "Score: ", p
             elif test.function == "group_discrimination":
                 suite, p = self.group_discrimination(i_fields=test.i_fields,
                                                      conf=test.conf,
                                                      margin=test.margin)
-                print "\n"
                 print test
                 print "Score: ", p
             elif test.function == "discrimination_search":
@@ -151,10 +150,19 @@ class Themis:
                                                   margin=test.margin,
                                                   group=test.group,
                                                   causal=test.causal)
-                print "\n"
                 print test
-                print "Group: ", g
-                print "Causal: ", c
+                if g:
+                    print "Group"
+                    print "-----"
+                    for key, value in g.items():
+                        print ", ".join(key) + " --> " + str(value)
+                print "\n"
+                if c:
+                    print "Causal"
+                    print "------"
+                    for key, value in c.items():
+                        print ", ".join(key) + " --> " + str(value)
+        print "--------------------------------------------------"
 
     def new_random_sub_input(self, args=[]):
         """
@@ -320,7 +328,7 @@ class Themis:
         Parameters
         ----------
         threshold : float in [0,1]
-            At least level of discrimination to be considered.
+            At least this level of discrimination to be considered.
         conf : float in [0, 1]
             The z* confidence level (percentage of normal distribution.
         margin : float in [0, 1]
@@ -336,25 +344,23 @@ class Themis:
             The lists of subsets of the input characteristics that discriminate.
         """
         assert group or causal
-        group_d_subs, causal_d_subs = [], []
-        print "\n"
+        group_d_scores, causal_d_scores = {}, {}
         for sub in self._all_relevant_subs(self.input_order):
-            if self._supset(list(set(group_d_subs)|set(causal_d_subs)), sub):
+            if self._supset(list(set(group_d_scores.keys())|
+                                 set(causal_d_scores.keys())), sub):
                 continue
             if group:
                 _, p = self.group_discrimination(i_fields=sub, conf=conf,
                                                    margin=margin)
-                print "Group: " + ", ".join(sub) + " --> " + str(p)
                 if p > threshold:
-                    group_d_subs.append(sub)
+                    group_d_scores[sub] = p
             if causal:
                 _, p = self.causal_discrimination(i_fields=sub, conf=conf,
                                                    margin=margin)
-                print "Causal: " + ", ".join(sub) + " --> " + str(p)
                 if p > threshold:
-                    causal_d_subs.append(sub)
+                    causal_d_scores[sub] = p
 
-        return group_d_subs, causal_d_subs
+        return group_d_scores, causal_d_scores
 
     def _all_relevant_subs(self, xs):
         return chain.from_iterable(combinations(xs, n) \

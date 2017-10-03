@@ -80,10 +80,9 @@ class Themis:
         tree = ET.parse(xml_fname)
         root = tree.getroot()
 
-        random.seed(int(root.find("seed").text))
-
-        self.max_samples = 200
-        self.min_samples = 10
+        self.max_samples = int(root.find("max_samples")
+        self.min_samples = int(root.find("min_samples")
+        self.rand_seed = int(root.find("seed").text)
         self.software_name = root.find("name").text
         self.command = root.find("command").text.strip()
         self._build_input_space(args=root.find("inputs"))
@@ -131,6 +130,7 @@ class Themis:
         Run Themis given the configuration.
         """
         for test in self.tests:
+            random.seed(self.rand_seed)
             if test.function == "causal_discrimination":
                 suite, p = self.causal_discrimination(i_fields=test.i_fields,
                                                       conf=test.conf,
@@ -213,7 +213,7 @@ class Themis:
         """
         assert assign != None
         tupled_args = self._tuple(assign)
-        if tupled_args in self.cache:
+        if tupled_args in self.cache.keys():
             return self.cache[tupled_args]
 
         cmd = self.command + " " + " ".join(tupled_args)
@@ -337,17 +337,20 @@ class Themis:
         """
         assert group or causal
         group_d_subs, causal_d_subs = [], []
+        print "\n"
         for sub in self._all_relevant_subs(self.input_order):
             if self._supset(list(set(group_d_subs)|set(causal_d_subs)), sub):
                 continue
             if group:
                 _, p = self.group_discrimination(i_fields=sub, conf=conf,
                                                    margin=margin)
+                print "Group: " + ", ".join(sub) + " --> " + str(p)
                 if p > threshold:
                     group_d_subs.append(sub)
             if causal:
                 _, p = self.causal_discrimination(i_fields=sub, conf=conf,
                                                    margin=margin)
+                print "Causal: " + ", ".join(sub) + " --> " + str(p)
                 if p > threshold:
                     causal_d_subs.append(sub)
 

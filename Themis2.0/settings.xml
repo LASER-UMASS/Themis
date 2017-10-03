@@ -3,6 +3,8 @@
     <name>Software</name>
     <command>python software.py</command>
     <seed>42</seed>
+    <max_samples>200</max_samples>
+    <min_samples>10</min_samples>
     <inputs>
         <input>
             <name>Sex</name>

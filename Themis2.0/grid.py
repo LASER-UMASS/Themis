@@ -519,7 +519,7 @@ class EditTestWindow(QDialog):
     def createGrid(self):
         self.horizontalGroupBox = QGroupBox("")
         layout = QGridLayout()
-        print("Hereeeeeeeeeeeeeeeee")
+
         self.type_label = QLabel("Test Function type: ")
         self.types = QComboBox()
         self.types.addItem("group_discrimination")
@@ -528,31 +528,31 @@ class EditTestWindow(QDialog):
 
         layout.addWidget(self.type_label, 1, 1)
         layout.addWidget(self.types, 1, 2)
-        print("Hereeeeeeeeeeeeeeeee2")
 
-        print("Hereeeeeeeeeeeeeeeee3")
+
+
         self.ifields_label = QLabel("i_fields (Please type the input names (separated by commas)")
         self.ifields = QLineEdit(self)
 
         layout.addWidget(self.ifields_label, 2, 1)
         layout.addWidget(self.ifields, 2, 2)
-        print("Hereeeeeeeeeeeeeeeee9")
+
         self.conf_label = QLabel("Enter confidence value")
         self.conf = QLineEdit(self)
 
         layout.addWidget(self.conf_label, 3, 1)
         layout.addWidget(self.conf, 3, 2)
-        print("Hereeeeeeeeeeeeeeeee10")
+
         self.types.currentIndexChanged.connect(self.selectionChange)
         #self.add_button = QPushButton("Add")
 
         #self.layout.addWidget(self.add_button, 4, 1)
-        print("Hereeeeeeeeeeeeeeeee11")
+
         self.done_button = QPushButton("Done")
         self.done_button.clicked.connect(self.handleDoneButton)
 
         layout.addWidget(self.done_button, 4, 4)
-        print("Hereeeeeeeeeeeeeeeee4")
+
         self.horizontalGroupBox.setLayout(layout)
         # print(self.name_box.text())
 
@@ -567,45 +567,47 @@ class EditTestWindow(QDialog):
 
     def handleDoneButton(self):
         global tree
-        print(self.name_box.text())
-        print(self.values_box.text())
-        print(self.types.currentText())
-
+        #print(self.name_box.text())
+        #print(self.values_box.text())
+        #print(self.types.currentText())
+        print("In the new done")
         rt = tree.getroot()
 
         # print(type(self.currTree))
         for child in rt:
             # print(type(child))
             # print(type(child.tag))
-            if child.tag == "inputs":
+            if child.tag == "tests":
 
-                input = ET.SubElement(child, 'input')
+                test = ET.SubElement(child, 'test')
 
-                name = ET.SubElement(input, 'name')
+                function = ET.SubElement(test, 'function')
 
-                name.text = self.name_box.text()
+                function.text = self.types.currentText()
 
-                tp = ET.SubElement(input, 'type')
-                tp.text = self.types.currentText().lower()
-
-                if self.types.currentText() == "Categorical":
-                    val_lst = self.values_box.text().split(",")
+                if self.types.currentText() == "group_discrimination" or  self.types.currentText() == "causal_discrimination":
+                    val_lst = self.ifields.text().split(",")
                     print("Made it here0")
-                    values = ET.SubElement(input, 'values')
+                    values = ET.SubElement(test, 'i_fields')
                     print("Made it here")
                     for str in val_lst:
-                        val = ET.SubElement(values, 'value')
+                        val = ET.SubElement(values, 'input_name')
                         val.text = str
                     print("Made it here2")
                 else:
-                    val_lst = self.values_box.text().split("-")
-                    bound = ET.SubElement(input, 'bounds')
-                    lowerbound = ET.SubElement(bound, 'lowerbound')
-                    lowerbound.text = val_lst[0]
-                    upperbound = ET.SubElement(bound, 'upperbound')
-                    upperbound.text = val_lst[1]
+                    threshold = ET.SubElement(test, 'threshold')
+                    threshold.text = self.ifields.text()
 
-                print("Update")
+                config = ET.SubElement(test, 'conf')
+                config.text = self.conf.text()
+
+                margin = ET.SubElement(test, 'margin')
+                print("Made it before margin")
+                num = float(self.conf.text())
+                print(num)
+                margin.text = (1.0 - float(self.conf.text())).__str__()
+
+                print("Update Tests")
 
         # tree.write("setter")
         self.v.updateTable()

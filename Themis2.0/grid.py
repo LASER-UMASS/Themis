@@ -428,7 +428,7 @@ class EditInputWindow(QDialog):
         self.types.currentIndexChanged.connect(self.selectionChange)
 
         self.add_button = QPushButton("Add")
-
+        self.add_button.clicked.connect(self.handleAddButton)
         layout.addWidget(self.add_button, 4, 1)
 
         self.done_button = QPushButton("Done")
@@ -445,6 +445,53 @@ class EditInputWindow(QDialog):
             self.values_label.setText("Enter range (e.g. 1-10) : ")
         else:
             self.values_label.setText("Values (separated by commas): ")
+
+    def handleAddButton(self):
+        global tree
+        print(self.name_box.text())
+        print(self.values_box.text())
+        print(self.types.currentText())
+
+        rt = tree.getroot()
+
+        # print(type(self.currTree))
+        for child in rt:
+            # print(type(child))
+            # print(type(child.tag))
+            if child.tag == "inputs":
+
+                input = ET.SubElement(child, 'input')
+
+                name = ET.SubElement(input, 'name')
+
+                name.text = self.name_box.text()
+
+                tp = ET.SubElement(input, 'type')
+                tp.text = self.types.currentText().lower()
+
+                if self.types.currentText() == "Categorical":
+                    val_lst = self.values_box.text().split(",")
+                    print("Made it here0")
+                    values = ET.SubElement(input, 'values')
+                    print("Made it here")
+                    for str in val_lst:
+                        val = ET.SubElement(values, 'value')
+                        val.text = str
+                    print("Made it here2")
+                else:
+                    val_lst = self.values_box.text().split("-")
+                    bound = ET.SubElement(input, 'bounds')
+                    lowerbound = ET.SubElement(bound, 'lowerbound')
+                    lowerbound.text = val_lst[0]
+                    upperbound = ET.SubElement(bound, 'upperbound')
+                    upperbound.text = val_lst[1]
+
+                print("Update")
+
+        # tree.write("setter")
+        self.v.updateTable()
+        self.name_box.setText(" ")
+        self.values_box.setText(" ")
 
     def handleDoneButton(self):
         global tree

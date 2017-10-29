@@ -199,16 +199,37 @@ class App(QDialog):
 
         #for categorical values
         self.input_values = {}
-        
+        ctr = 0
         for run_input in root.iter('input'):
             name = run_input.find('name').text
             print(name)
-##            values = []
-##            i = 0
-            
-            for input_value in run_input.iter('value'):
-                value = input_value.text
-                print(value)
+            categoricalFlag = False
+            for j in run_input.iter('type'):
+
+                if j.text == "categorical":
+
+                    categoricalFlag = True
+            values = []
+            if(categoricalFlag is True):
+                for i in run_input.iter('value'):
+
+                    values.append(i.text)
+            else:
+
+                for lbound in run_input.iter('lowerbound'):
+                   
+                    values.append(lbound.text)
+                for ubound in run_input.iter('upperbound'):
+                    values.append(ubound.text)
+
+
+            if (len(values) != 0):
+                self.setCellValue(values.__str__(), ctr, 3)
+            ctr += 1
+
+
+
+                #print(value + "  " + "These are the values")
 ##                values[i] = value
 ##                i +=1
                 
@@ -231,7 +252,7 @@ class App(QDialog):
                 if item == None:
                     self.setCellValue(input_type,i,2)
                     break
-            
+
 
     def setCellValue(self, value, row, column):
         new_input = QTableWidgetItem()
@@ -307,25 +328,7 @@ class EditInputWindow(QDialog):
             self.values_label.setText("Values (separated by commas): ")
             
 
-##        self.
-##
-##        if self.types.currentText() == "Continuous Int":
-##            
-##            lower_bound_label = QLabel("Lower Bound:")
-##            self.lower_bound_box = QLineEdit(self)
-##            upper_bound_label = QLabel("Upper Bound:")
-##            self.upper_bound_box = QLineEdit(self)
-##            
-##            self.layout.addWidget(lower_bound_label, 3, 1)
-##            self.layout.addWidget(self.lower_bound_box, 3, 2)
-##
-##            self.layout.addWidget(upper_bound_label, 4, 1)
-##            self.layout.addWidget(upper_bound_box, 4, 2)
-##            
-##        elif self.types.currentText() == "Categorical":
-## 
-##
-##        self.horizontalGroupBox.setLayout(self.layout)
+
 
 
 if __name__ == '__main__':

@@ -13,6 +13,7 @@ class App(QDialog):
         self.top = 100
         self.width = 800
         self.height = 1000
+        self.tree = None
         self.initUI()
  
     def initUI(self):
@@ -72,6 +73,7 @@ class App(QDialog):
         load_button.clicked.connect(self.handleLoadButton)
         
         save_button = QPushButton('Save...')
+        save_button.clicked.connect(self.handleSaveButton)
         
         add_button = QPushButton('Add Input...')
         add_button.clicked.connect(self.handleAddButton)
@@ -122,6 +124,9 @@ class App(QDialog):
             self.file = open(filename[0], 'r')
 
         self.processSettingsFiles()
+
+    def handleSaveButton(self):
+        self.tree.write("settings")
 
     def createInputsTable(self):        
         
@@ -174,8 +179,8 @@ class App(QDialog):
         table.setCellWidget(row,0,cellWidget)
 
     def processSettingsFiles(self):
-        tree = ET.parse(self.file)
-        root = tree.getroot()
+        self.tree = ET.parse(self.file)
+        root = self.tree.getroot()
 
 
         run_command = root.find('command').text

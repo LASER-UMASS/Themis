@@ -3,7 +3,9 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import xml.etree.ElementTree as ET
- 
+
+tree = None
+
 class App(QDialog):
  
     def __init__(self):
@@ -13,7 +15,7 @@ class App(QDialog):
         self.top = 100
         self.width = 800
         self.height = 1000
-        self.tree = None
+        #self.tree = None
         self.initUI()
  
     def initUI(self):
@@ -76,8 +78,9 @@ class App(QDialog):
         save_button.clicked.connect(self.handleSaveButton)
         
         add_button = QPushButton('Add Input...')
+
         add_button.clicked.connect(self.handleAddButton)
-        self.dialog = EditInputWindow()
+        self.dialog = EditInputWindow(self)
 
         layout.addWidget(self.inputs_table,0,1, 3, 4)
         layout.addWidget(load_button,5, 1)
@@ -113,8 +116,11 @@ class App(QDialog):
         self.horizontalGroupBox4.setLayout(layout4)
 
     def handleAddButton(self):
+        global tree
         self.dialog.setModal(True)
         self.dialog.show()
+
+
 
     def handleLoadButton(self):
         dialog = QFileDialog()
@@ -126,7 +132,8 @@ class App(QDialog):
         self.processSettingsFiles()
 
     def handleSaveButton(self):
-        self.tree.write("settings")
+        global tree
+        tree.write("settings")
 
     def createInputsTable(self):        
         
@@ -179,8 +186,9 @@ class App(QDialog):
         table.setCellWidget(row,0,cellWidget)
 
     def processSettingsFiles(self):
-        self.tree = ET.parse(self.file)
-        root = self.tree.getroot()
+        global tree
+        tree = ET.parse(self.file)
+        root = tree.getroot()
 
 
         run_command = root.find('command').text
@@ -207,6 +215,7 @@ class App(QDialog):
         ctr = 0
         for run_input in root.iter('input'):
             name = run_input.find('name').text
+            input_type = run_input.find('type').text
             print(name)
             categoricalFlag = False
             for j in run_input.iter('type'):
@@ -227,30 +236,31 @@ class App(QDialog):
                 for ubound in run_input.iter('upperbound'):
                     values.append(ubound.text)
 
-
+            self.setCellValue(name, ctr, 1)
+            self.setCellValue(input_type, ctr, 2)
             if (len(values) != 0):
                 self.setCellValue(values.__str__(), ctr, 3)
             ctr += 1
 
-            index = 0
-            for run_test in root.iter('test'):
-                str1 = ""
-                str2 = ""
-                str3 = ""
-                for func in run_test.iter("function"):
-                    str1 = func.text
-                for config in run_test.iter("conf"):
-                    str2 = config.text
-                for marg in run_test.iter("margin"):
-                    str3 = marg.text
-                print(str1)
-                print(str2)
-                print(str3)
-                print("Got all the values")
-                self.setTestTableValue(str1,index,1)
-                self.setTestTableValue(str2, index, 2)
-                self.setTestTableValue(str3, index, 3)
-                index += 1
+        index = 0
+        for run_test in root.iter('test'):
+            str1 = ""
+            str2 = ""
+            str3 = ""
+            for func in run_test.iter("function"):
+                str1 = func.text
+            for config in run_test.iter("conf"):
+                str2 = config.text
+            for marg in run_test.iter("margin"):
+                str3 = marg.text
+            print(str1)
+            print(str2)
+            print(str3)
+            print("Got all the values")
+            self.setTestTableValue(str1,index,1)
+            self.setTestTableValue(str2, index, 2)
+            self.setTestTableValue(str3, index, 3)
+            index += 1
                         #print(value + "  " + "These are the values")
 ##                values[i] = value
 ##                i +=1
@@ -261,19 +271,91 @@ class App(QDialog):
 ##            print (key)
 ##            print (self.input_values[key])
 
+    #    for run_input in root.iter('input'):
+    #        name = run_input.find('name').text
+    #        for i in range(self.inputs_table.rowCount()):
+    #            item = self.inputs_table.item(i,1)
+    #            if item == None:
+    #                self.setCellValue(name,i,1)
+    #                break
+    #        input_type = run_input.find('type').text
+    #        for i in range(self.inputs_table.rowCount()):
+    #            item = self.inputs_table.item(i,2)
+    #            if item == None:
+    #                self.setCellValue(input_type,i,2)
+    #                break
+
+    def updateTable(self):
+        global tree
+        root = tree.getroot()
+
+        run_command = root.find('command').text
+        self.command_box.setText(run_command)
+
+        seed = root.find('seed').text
+        self.seed_box.setText(seed)
+
+        max_samples = root.find('max_samples').text
+        self.max_box.setText(max_samples)
+
+        min_samples = root.find('min_samples').text
+        self.min_box.setText(min_samples)
+
+        # column 1 = Input Name
+        # column 2 = Input Type
+        # column 3 = Values
+        # column 4 = Lower Bound
+        # column 5 = Upper Bound
+
+        # for categorical values
+        self.input_values = {}
+        ctr = 0
         for run_input in root.iter('input'):
             name = run_input.find('name').text
-            for i in range(self.inputs_table.rowCount()):
-                item = self.inputs_table.item(i,1)
-                if item == None:
-                    self.setCellValue(name,i,1)
-                    break
             input_type = run_input.find('type').text
-            for i in range(self.inputs_table.rowCount()):
-                item = self.inputs_table.item(i,2)
-                if item == None:
-                    self.setCellValue(input_type,i,2)
-                    break
+            print(name)
+            categoricalFlag = False
+            for j in run_input.iter('type'):
+
+                if j.text == "categorical":
+                    categoricalFlag = True
+            values = []
+            if (categoricalFlag is True):
+                for i in run_input.iter('value'):
+                    #print(i, "   These are he vals")
+                    values.append(i.text)
+            else:
+
+                for lbound in run_input.iter('lowerbound'):
+                    values.append(lbound.text)
+                for ubound in run_input.iter('upperbound'):
+                    values.append(ubound.text)
+
+            self.setCellValue(name, ctr, 1)
+            self.setCellValue(input_type, ctr, 2)
+            if (len(values) != 0):
+                self.setCellValue(values.__str__(), ctr, 3)
+            ctr += 1
+
+        index = 0
+        for run_test in root.iter('test'):
+            str1 = ""
+            str2 = ""
+            str3 = ""
+            for func in run_test.iter("function"):
+                str1 = func.text
+            for config in run_test.iter("conf"):
+                str2 = config.text
+            for marg in run_test.iter("margin"):
+                str3 = marg.text
+            print(str1)
+            print(str2)
+            print(str3)
+            print("Got all the values")
+            self.setTestTableValue(str1, index, 1)
+            self.setTestTableValue(str2, index, 2)
+            self.setTestTableValue(str3, index, 3)
+            index += 1
 
 
     def setCellValue(self, value, row, column):
@@ -286,17 +368,20 @@ class App(QDialog):
         new_input.setText(value)
         self.tests_table.setItem(row,column,new_input)
 
+
     
 class EditInputWindow(QDialog):
 
-    def __init__(self):
+    def __init__(self, var):
         super().__init__()
         self.title = 'Add or Edit Inputs'
         self.left = 100
         self.top = 100
         self.width = 500
         self.height = 300
+        self.v = var
         self.initUI()
+
 
     def initUI(self):
         self.setWindowTitle(self.title)
@@ -320,13 +405,13 @@ class EditInputWindow(QDialog):
         layout.addWidget(name_label, 1, 1)
         layout.addWidget(self.name_box, 1, 2)
 
-        type_label = QLabel("Input type: ")
+        self.type_label = QLabel("Input type: ")
         self.types = QComboBox()
         self.types.addItem("Categorical")
         self.types.addItem("Continuous Int")
         
 
-        layout.addWidget(type_label, 2, 1)
+        layout.addWidget(self.type_label, 2, 1)
         layout.addWidget(self.types, 2, 2)
         self.values_label = QLabel("Values (separated by commas): ")
         self.values_box = QLineEdit(self)
@@ -341,10 +426,12 @@ class EditInputWindow(QDialog):
         layout.addWidget(self.add_button, 4, 1)
 
         self.done_button = QPushButton("Done")
+        self.done_button.clicked.connect(self.handleDoneButton)
 
         layout.addWidget(self.done_button, 4, 4)
         
         self.horizontalGroupBox.setLayout(layout)
+        #print(self.name_box.text())
 
     def selectionChange(self):
 
@@ -352,7 +439,53 @@ class EditInputWindow(QDialog):
             self.values_label.setText("Enter range (e.g. 1-10) : ")
         else:
             self.values_label.setText("Values (separated by commas): ")
-            
+
+    def handleDoneButton(self):
+        global tree
+        print(self.name_box.text())
+        print(self.values_box.text())
+        print(self.types.currentText())
+
+        rt = tree.getroot()
+
+                #print(type(self.currTree))
+        for child in rt:
+            #print(type(child))
+            #print(type(child.tag))
+            if child.tag == "inputs":
+
+                input = ET.SubElement(child, 'input')
+
+                name = ET.SubElement(input, 'name')
+
+                name.text = self.name_box.text()
+
+                tp = ET.SubElement(input, 'type')
+                tp.text = self.types.currentText().lower()
+
+                if self.types.currentText() == "Categorical":
+                    val_lst = self.values_box.text().split(",")
+                    print("Made it here0")
+                    values = ET.SubElement(input, 'values')
+                    print("Made it here")
+                    for str in val_lst:
+                        val = ET.SubElement(values, 'value')
+                        val.text = str
+                    print("Made it here2")
+                else:
+                    val_lst = self.values_box.text().split("-")
+                    bound = ET.SubElement(input, 'bounds')
+                    lowerbound = ET.SubElement(bound, 'lowerbound')
+                    lowerbound.text = val_lst[0]
+                    upperbound = ET.SubElement(bound, 'upperbound')
+                    upperbound.text = val_lst[1]
+
+                print("Update")
+
+        #tree.write("setter")
+        self.v.updateTable()
+        self.close()
+
 
 
 

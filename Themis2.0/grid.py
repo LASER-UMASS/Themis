@@ -16,8 +16,9 @@ class App(QDialog):
         self.width = 800
         self.height = 1000
         #self.tree = None
+        self.dialog = None
         self.initUI()
- 
+
     def initUI(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
@@ -80,7 +81,7 @@ class App(QDialog):
         add_button = QPushButton('Add Input...')
 
         add_button.clicked.connect(self.handleAddButton)
-        self.dialog = EditInputWindow(self)
+        #self.dialog = EditInputWindow(self)
 
         layout.addWidget(self.inputs_table,0,1, 3, 4)
         layout.addWidget(load_button,5, 1)
@@ -92,6 +93,7 @@ class App(QDialog):
         self.createTestsTable()
 
         add_test_button = QPushButton("Add Test...")
+        add_test_button.clicked.connect(self.handleAddTestButton)
 
         layout2.addWidget(self.tests_table, 5, 4, 4, 4)
         layout2.addWidget(add_test_button, 9, 4)
@@ -117,10 +119,14 @@ class App(QDialog):
 
     def handleAddButton(self):
         global tree
+        self.dialog = EditInputWindow(self)
         self.dialog.setModal(True)
         self.dialog.show()
 
-
+    def handleAddTestButton(self):
+        self.dialog = EditTestWindow(self)
+        self.dialog.setModal(True)
+        self.dialog.show()
 
     def handleLoadButton(self):
         dialog = QFileDialog()
@@ -487,7 +493,123 @@ class EditInputWindow(QDialog):
         self.close()
 
 
+class EditTestWindow(QDialog):
+    def __init__(self, var):
+        super().__init__()
+        self.title = 'Add or Edit Tests'
+        self.left = 100
+        self.top = 100
+        self.width = 500
+        self.height = 300
+        self.v = var
+        self.initUI()
 
+    def initUI(self):
+        self.setWindowTitle(self.title)
+        self.setGeometry(self.left, self.top, self.width, self.height)
+
+        self.createGrid()
+
+        windowLayout = QVBoxLayout()
+        windowLayout.addWidget(self.horizontalGroupBox)
+        self.setLayout(windowLayout)
+
+    ##        self.show()
+
+    def createGrid(self):
+        self.horizontalGroupBox = QGroupBox("")
+        layout = QGridLayout()
+        print("Hereeeeeeeeeeeeeeeee")
+        self.type_label = QLabel("Test Function type: ")
+        self.types = QComboBox()
+        self.types.addItem("group_discrimination")
+        self.types.addItem("causal_discrimination")
+        self.types.addItem("discrimination_search")
+
+        layout.addWidget(self.type_label, 1, 1)
+        layout.addWidget(self.types, 1, 2)
+        print("Hereeeeeeeeeeeeeeeee2")
+
+        print("Hereeeeeeeeeeeeeeeee3")
+        self.ifields_label = QLabel("i_fields (Please type the input names (separated by commas)")
+        self.ifields = QLineEdit(self)
+
+        layout.addWidget(self.ifields_label, 2, 1)
+        layout.addWidget(self.ifields, 2, 2)
+        print("Hereeeeeeeeeeeeeeeee9")
+        self.conf_label = QLabel("Enter confidence value")
+        self.conf = QLineEdit(self)
+
+        layout.addWidget(self.conf_label, 3, 1)
+        layout.addWidget(self.conf, 3, 2)
+        print("Hereeeeeeeeeeeeeeeee10")
+        self.types.currentIndexChanged.connect(self.selectionChange)
+        #self.add_button = QPushButton("Add")
+
+        #self.layout.addWidget(self.add_button, 4, 1)
+        print("Hereeeeeeeeeeeeeeeee11")
+        self.done_button = QPushButton("Done")
+        self.done_button.clicked.connect(self.handleDoneButton)
+
+        layout.addWidget(self.done_button, 4, 4)
+        print("Hereeeeeeeeeeeeeeeee4")
+        self.horizontalGroupBox.setLayout(layout)
+        # print(self.name_box.text())
+
+    def selectionChange(self):
+
+        print("In here")
+
+        if self.types.currentText() == "discrimination_search":
+            self.ifields_label.setText("Enter threshold value")
+        else:
+            self.ifields_label.setText("i_fields (Please type the input names (separated by commas)")
+
+    def handleDoneButton(self):
+        global tree
+        print(self.name_box.text())
+        print(self.values_box.text())
+        print(self.types.currentText())
+
+        rt = tree.getroot()
+
+        # print(type(self.currTree))
+        for child in rt:
+            # print(type(child))
+            # print(type(child.tag))
+            if child.tag == "inputs":
+
+                input = ET.SubElement(child, 'input')
+
+                name = ET.SubElement(input, 'name')
+
+                name.text = self.name_box.text()
+
+                tp = ET.SubElement(input, 'type')
+                tp.text = self.types.currentText().lower()
+
+                if self.types.currentText() == "Categorical":
+                    val_lst = self.values_box.text().split(",")
+                    print("Made it here0")
+                    values = ET.SubElement(input, 'values')
+                    print("Made it here")
+                    for str in val_lst:
+                        val = ET.SubElement(values, 'value')
+                        val.text = str
+                    print("Made it here2")
+                else:
+                    val_lst = self.values_box.text().split("-")
+                    bound = ET.SubElement(input, 'bounds')
+                    lowerbound = ET.SubElement(bound, 'lowerbound')
+                    lowerbound.text = val_lst[0]
+                    upperbound = ET.SubElement(bound, 'upperbound')
+                    upperbound.text = val_lst[1]
+
+                print("Update")
+
+        # tree.write("setter")
+        self.v.updateTable()
+        self.close()
 
 
 if __name__ == '__main__':

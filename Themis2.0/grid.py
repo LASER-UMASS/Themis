@@ -62,7 +62,7 @@ class App(QDialog):
 
         layout4.addWidget(min_box_label,4,0)
         layout4.addWidget(self.min_box,4,1)
-        
+
         self.horizontalGroupBox = QGroupBox("Inputs")
         layout = QGridLayout()
         layout.setSpacing(5)
@@ -185,11 +185,81 @@ class App(QDialog):
 
         edit_btn = QPushButton(table)
         edit_btn.setText("Edit...")
+        edit_btn.clicked.connect(lambda: self.handleEditButton(row, table))
         layout.addWidget(edit_btn)
         cellWidget = QWidget()
         cellWidget.setLayout(layout)
         
         table.setCellWidget(row,0,cellWidget)
+
+    def handleEditButton(self, row, table):
+        global tree
+        root = tree.getroot()
+        print(row)
+        lst = []
+        if table is self.inputs_table:
+            ctr = 0
+            print("Input")
+
+            for run_input in root.iter('input'):
+                ret_val = []
+                name = run_input.find('name').text
+                input_type = run_input.find('type').text
+                #print(name)
+                ret_val.append([name])
+                #print(input_type)
+                ret_val.append([input_type])
+                categoricalFlag = False
+                for j in run_input.iter('type'):
+
+                    if j.text == "categorical":
+                        categoricalFlag = True
+
+                if (categoricalFlag is True):
+                    for i in run_input.iter('value'):
+                 #       print(i.text)
+                        ret_val.append([i.text])
+                else:
+
+                    for lbound in run_input.iter('lowerbound'):
+                  #      print(lbound.text)
+                        ret_val.append([lbound.text])
+                    for ubound in run_input.iter('upperbound'):
+                   #     print(ubound.text)
+                        ret_val.append([ubound.text])
+
+                if ctr == row:
+                    lst = ret_val
+                    break;
+                ctr += 1
+
+            self.dialog = EditPopupWindow(self, lst, row)
+            self.dialog.setModal(True)
+            self.dialog.show()
+        else:
+            index = 0
+            for run_test in root.iter('test'):
+                ret_val = []
+                str1 = ""
+                str2 = ""
+                str3 = ""
+                for func in run_test.iter("function"):
+                    str1 = func.text
+                for config in run_test.iter("conf"):
+                    str2 = config.text
+                for marg in run_test.iter("margin"):
+                    str3 = marg.text
+                #print(str1)
+                ret_val.append([str1])
+                #print(str2)
+                ret_val.append([str2])
+                #print(str3)
+                ret_val.append([str3])
+                #print("Got all the values")
+                if index == row:
+                    lst = ret_val
+                index += 1
+        print(lst)
 
     def processSettingsFiles(self):
         global tree
@@ -267,29 +337,8 @@ class App(QDialog):
             self.setTestTableValue(str2, index, 2)
             self.setTestTableValue(str3, index, 3)
             index += 1
-                        #print(value + "  " + "These are the values")
-##                values[i] = value
-##                i +=1
-                
-##            self.input_values[name] = values
 
-##        for key in self.input_values:
-##            print (key)
-##            print (self.input_values[key])
 
-    #    for run_input in root.iter('input'):
-    #        name = run_input.find('name').text
-    #        for i in range(self.inputs_table.rowCount()):
-    #            item = self.inputs_table.item(i,1)
-    #            if item == None:
-    #                self.setCellValue(name,i,1)
-    #                break
-    #        input_type = run_input.find('type').text
-    #        for i in range(self.inputs_table.rowCount()):
-    #            item = self.inputs_table.item(i,2)
-    #            if item == None:
-    #                self.setCellValue(input_type,i,2)
-    #                break
 
     def updateTable(self):
         global tree
@@ -655,6 +704,101 @@ class EditTestWindow(QDialog):
                 margin.text = (1.0 - float(self.conf.text())).__str__()
 
                 print("Update Tests")
+
+        # tree.write("setter")
+        self.v.updateTable()
+        self.close()
+
+
+class EditPopupWindow(QDialog):
+    def __init__(self, var, lst, row):
+        super().__init__()
+        self.title = 'Edit Inputs'
+        self.left = 100
+        self.top = 100
+        self.width = 500
+        self.height = 300
+        self.v = var
+        self.vals = lst
+        self.num = row
+        self.initUI()
+
+    def initUI(self):
+        self.setWindowTitle(self.title)
+        self.setGeometry(self.left, self.top, self.width, self.height)
+
+        self.createGrid()
+
+        windowLayout = QVBoxLayout()
+        windowLayout.addWidget(self.horizontalGroupBox)
+        self.setLayout(windowLayout)
+
+    ##        self.show()
+
+    def createGrid(self):
+        self.horizontalGroupBox = QGroupBox("")
+        layout = QGridLayout()
+
+        name_label = QLabel("Input name: ")
+        self.name_box = QLineEdit(self)
+
+        layout.addWidget(name_label, 1, 1)
+        layout.addWidget(self.name_box, 1, 2)
+
+        self.type_label = QLabel("Input type: ")
+        self.types = QComboBox()
+        self.types.addItem("Categorical")
+        self.types.addItem("Continuous Int")
+
+        layout.addWidget(self.type_label, 2, 1)
+        layout.addWidget(self.types, 2, 2)
+        self.values_label = QLabel("Values (separated by commas): ")
+        self.values_box = QLineEdit(self)
+
+        layout.addWidget(self.values_label, 3, 1)
+        layout.addWidget(self.values_box, 3, 2)
+
+        self.types.currentIndexChanged.connect(self.selectionChange)
+
+
+
+        self.done_button = QPushButton("Done")
+        self.done_button.clicked.connect(self.handleDoneButton)
+
+        layout.addWidget(self.done_button, 4, 4)
+
+        self.horizontalGroupBox.setLayout(layout)
+        # print(self.name_box.text())
+
+    def selectionChange(self):
+
+        if self.types.currentText() == "Continuous Int":
+            self.values_label.setText("Enter range (e.g. 1-10) : ")
+        else:
+            self.values_label.setText("Values (separated by commas): ")
+
+
+    def handleDoneButton(self):
+        global tree
+        print(self.name_box.text())
+        print(self.values_box.text())
+        print(self.types.currentText())
+
+        rt = tree.getroot()
+        for run_input in rt.iter('input'):
+            name = run_input.find('name').text
+            input_type = run_input.find('type').text
+            print("before if condition")
+
+            if self.vals[0][0] == name and self.vals[1][0] == input_type:
+                print("Inside if condition")
+                loop_ctr = 0
+                for i in run_input:
+                   if loop_ctr == 0:
+                       i.text = self.name_box.text()
+                   loop_ctr += 1
+        # print(type(self.currTree))
+
 
         # tree.write("setter")
         self.v.updateTable()

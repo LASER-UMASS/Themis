@@ -107,7 +107,7 @@ class App(QDialog):
         self.results_box.setText('This is where results will be printed.')
 
         run_button = QPushButton("Run")
-        
+        run_button.clicked.connect(self.handleRunButton)
         layout3.addWidget(run_button,1, 1)
         layout3.addWidget(self.results_box, 2, 1, 5, 5)        
 
@@ -116,6 +116,10 @@ class App(QDialog):
         self.horizontalGroupBox2.setLayout(layout2)
         self.horizontalGroupBox3.setLayout(layout3)
         self.horizontalGroupBox4.setLayout(layout4)
+
+    def handleRunButton(self):
+
+        return
 
     def handleAddButton(self):
         global tree
@@ -366,6 +370,9 @@ class App(QDialog):
         self.input_values = {}
         ctr = 0
         for run_input in root.iter('input'):
+            for k in run_input.iter('value'):
+                print(k.text, " valuesHere")
+
             name = run_input.find('name').text
             input_type = run_input.find('type').text
             print(name)
@@ -376,11 +383,12 @@ class App(QDialog):
                     categoricalFlag = True
             values = []
             if (categoricalFlag is True):
+                print("categoricalFlag is True")
                 for i in run_input.iter('value'):
+                    print(i.text, " valuesInUpdateTabl")
                     #print(i, "   These are he vals")
                     values.append(i.text)
             else:
-
                 for lbound in run_input.iter('lowerbound'):
                     values.append(lbound.text)
                 for ubound in run_input.iter('upperbound'):
@@ -549,6 +557,9 @@ class EditInputWindow(QDialog):
         print(self.types.currentText())
 
         rt = tree.getroot()
+
+
+
 
                 #print(type(self.currTree))
         for child in rt:
@@ -796,7 +807,36 @@ class EditPopupWindow(QDialog):
                 for i in run_input:
                    if loop_ctr == 0:
                        i.text = self.name_box.text()
+                   if loop_ctr == 1:
+                       i.text = self.types.currentText()
+                   if loop_ctr == 2:
+                       if input_type.lower() == 'categorical':
+                           print("about to remove")
+                           run_input.remove(i)
+                           print("removed!!")
+                       else:
+                           run_input.remove(i)
+                   if loop_ctr == 2:
+                       if self.types.currentText().lower() == 'categorical':
+                           val_lst = self.values_box.text().split(",")
+                           #print("Made it here0")
+                           values = ET.SubElement(run_input, 'values')
+                           #print("Made it here")
+                           for str in val_lst:
+                               val = ET.SubElement(values, 'value')
+                               val.text = str
+                       else:
+                           val_lst = self.values_box.text().split("-")
+                           bound = ET.SubElement(run_input, 'bounds')
+                           lowerbound = ET.SubElement(bound, 'lowerbound')
+                           lowerbound.text = val_lst[0]
+                           upperbound = ET.SubElement(bound, 'upperbound')
+                           upperbound.text = val_lst[1]
+                       break
                    loop_ctr += 1
+            #for k in run_input.iter('value'):
+            #    print(k.text, " valuesHere")
+
         # print(type(self.currTree))
 
 

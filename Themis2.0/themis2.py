@@ -149,23 +149,25 @@ class Themis:
             name of the xml file we want to import settings from.
         """
 
-        assert xml_fname != ""
-        try:
-            tree = ET.parse(xml_fname)
-            root = tree.getroot()
+        if xml_fname != "":
+            try:
+                tree = ET.parse(xml_fname)
+                root = tree.getroot()
 
-            self.max_samples = int(root.find("max_samples").text)
-            self.min_samples = int(root.find("min_samples").text)
-            self.rand_seed = int(root.find("seed").text)
-            self.software_name = root.find("name").text
-            self.command = root.find("command").text.strip()
-            self._build_input_space(args=root.find("inputs"))
-            self._load_tests(args=root.find("tests"))
-            self._cache = {}
-            self.extended_output = ""
+                self.max_samples = int(root.find("max_samples").text)
+                self.min_samples = int(root.find("min_samples").text)
+                self.rand_seed = int(root.find("seed").text)
+                self.software_name = root.find("name").text
+                self.command = root.find("command").text.strip()
+                self._build_input_space(args=root.find("inputs"))
+                self._load_tests(args=root.find("tests"))
+                self._cache = {}
+                
+            except:
+                print("issue with reading xml file and initializing Themis")
+        else:
+            self.cache = {}
             
-        except:
-            print("issue with reading xml file and initializing Themis")
     def run(self):
         """
         Run Themis tests specified in the configuration file.
@@ -184,6 +186,8 @@ class Themis:
             # value = percentage from test execution
             self.group_tests = {}
             self.causal_tests = {}
+            self.group_search_results = {}
+            self.causal_search_results = {}
 
             self.simple_discrim_output = ""
             self.detailed_discrim_output = ""
@@ -221,33 +225,20 @@ class Themis:
                                                       margin=test.margin,
                                                       group=test.group,
                                                       causal=test.causal)
-##                    self.simple_discrim_output += str(test) 
+
                     if g:
-                        self.simple_discrim_output += "Group\n"
-                        self.simple_discrim_output += "-------\n"
+
                         for key, value in g.items():
                             values = ", ".join(key) + " --> " + "{:.1%}".format(value) + "\n"
-                            self.simple_discrim_output += values
-                            self.simple_discrim_output += "\n"
-                        self.simple_discrim_output += ""
-
-                        print ("Discrimination search ran for group discrimination")
-                        print (self.simple_discrim_output)
-
-                        #store threshold in extended output
-                        
+                            
+                            self.group_search_results[tuple(key)] = "{:.1%}".format(value)
+                                                    
                     if c:
-                        self.simple_discrim_output += "Causal\n"
-                        self.simple_discrim_output += "-------\n"
                         for key, value in c.items():
                             values = ", ".join(key) + " --> " + "{:.1%}".format(value) + "\n"
-                            self.simple_discrim_output += values
 
-                        print ("Discrimination search (causal discrimination)")
-                        print ("Threshold: " + "{:.1%}".format(test.threshold) + "\n")                        
-                        print (self.simple_discrim_output)
-
-                    
+                            self.causal_search_results[tuple(key)] = "{:.1%}".format(value)
+ 
             
             print ("Group Discrimination Tests: \n")
             for key,value in self.group_tests.items():
@@ -545,6 +536,44 @@ class Themis:
         except:
             print("Issue in building the input space/scope. Major problem")
 
+    def _add_input(self, name=None, kind=None, values=None):
+        assert name != None
+        assert kind != None
+        assert values != None
+
+        try:
+
+            try:
+                self.inputs
+            except AttributeError:
+                self.inputs = {}
+                self.input_order = []
+                self.input_names = []
+
+            local_values = []
+                       
+            self.input_names.append(name)
+            
+            if kind == "Categorical":
+                i_values = values.split(',')
+                self.inputs[name] = Input(name=name, values=i_values, kind="categorical")
+            elif kind == "Continuous Int":
+                ulb = values.split('-')
+                lowerbound = ulb[0]
+                upperbound = ulb[1]
+
+                local_values = range(int(lowerbound),int(upperbound))
+
+                self.inputs[name] = Input(name=name, values=local_values, kind="continuousInt", lb = str(lowerbound), ub = str(upperbound))
+            else:
+                assert False
+
+            self.input_order.append(name)
+
+        except:
+            print("Issue in adding input to input space.")
+            
+
     def _load_tests(self, args=None):
         assert args != None
         try:
@@ -565,6 +594,17 @@ class Themis:
                 self.tests.append(test)
         except:
             print("Issue in loading the tests")
+            
+    def _add_test(self, name=None, conf=None, margin=None, threshold=0.20):
+        self.threshold = threshold
+
+        try:
+            self.tests
+        except AttributeError:
+            self.tests = []
+
+        test = Test()
+        
 
 if __name__ == '__main__':
     try:

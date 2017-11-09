@@ -16,7 +16,7 @@ class App(QDialog):
         self.left = 100
         self.top = 100
         self.width = 800
-        self.height = 700
+        self.height = 1000
         self.dialog = None
         self.initUI()
 
@@ -122,46 +122,129 @@ class App(QDialog):
         self.horizontalGroupBox2.setLayout(layout2)
         
         self.horizontalGroupBox4.setLayout(layout4)
+
+    def addTest(self):
+        self.dialog = EditTestWindow(True)
+        self.dialog.setModal(True)
+        self.dialog.show()
+        
+        if self.dialog.exec_():
+            tests = self.dialog.all_measurements
+            conf_values = self.dialog.all_confs
+            margins = self.dialog.all_margins
+            inputs = self.dialog.all_inputs
+                
+            
+            for i in range(len(tests)):
+                print ("Measurement: " + tests[i])
+                print ("Confidence: " + conf_values[i])
+                print ("Margin: " + margins[i])
+                print ("Inputs of interest: " + ",".join(inputs[i]))
+
+                test = tests[i]
+                conf = conf_values[i]
+                margin = margins[i]
+                i_fields = list(inputs[i])
+
+                self.tests_table.insertRow(i)
+                self.createEditButtons(self.tests_table, i, test=None)
+
+                self.setTestTableValue(test, i, 1)
+                self.setTestTableValue(conf, i, 2)
+                self.setTestTableValue(margin, i, 3)
+                self.setTestTableValue(",".join(i_fields), i, 4)
+
+                if test == "Group Discrimination":
+                    test = self.tester._new_test(False, False, "group_discrimination", float(conf), float(margin), i_fields)
+
+                elif test == "Causal Discrimination":
+                    test = self.tester._new_test(False, False, "causal_discrimination", float(conf), float(margin), i_fields)
+
+                else:
+                    if test == "Discrimination Search Causal":
+                        test = self.tester._new_test( False, True, "discrimination_search", float(conf), float(margin),i_fields)
+                    elif test == "Discrimination Search Group":
+                        test = self.tester._new_test( True, False, "discrimination_search", float(conf), float(margin), i_fields)
+                    else:
+                        test = self.tester._new_test(True, True, "discrimination_search", float(conf), float(margin), i_fields)
+                
+        self.resizeCells(self.tests_table)
+                
+
+    def addInput(self):
+        dialog = EditInputWindow(True)
+        dialog.setModal(True)
+        dialog.show()
+
+        if dialog.exec_():
+           for i in range(len(dialog.all_names)):
+                print("Name: " + dialog.all_names[i])
+                print("Type: " + dialog.all_types[i])
+                print("Values: " + dialog.all_values[i])
+
+                name = dialog.all_names[i]
+                kind = dialog.all_types[i]
+                values = dialog.all_values[i]
+
+                self.inputs_table.insertRow(i)
+                self.createEditButtons(self.inputs_table, i, test=None)
+
+                self.setCellValue(name, i, 1)
+                self.setCellValue(kind, i, 2)
+                
+                if kind == "Categorical":
+                    self.setCellValue("{" + values + "}", i, 3)
+                    
+                    self.tester._add_input(name, "Categorical", values)
+                else:
+                    ulb = values.split('-')
+                    lb = ulb[0]
+                    ub = ulb[1]
+                    self.setCellValue("(" + lb + "-" + ub + ")", i, 3)
+                    
+                    self.tester._add_input(name, "Continuous Int", values)
+                    
+        self.resizeCells(self.inputs_table)               
+
         
     def handleRunButton(self):
-
-##        self.tester.max_samples = int(self.max_box.text())
-##        self.tester.min_samples = int(self.min_box.text())
-##        self.tester.rand_seed = int(self.seed_box.text())
-##        self.tester.command = self.command_box.text()
+        #python software2.py
+        #42
+        #200
+        #10
+        self.tester.max_samples = int(self.max_box.text())
+        self.tester.min_samples = int(self.min_box.text())
+        self.tester.rand_seed = int(self.seed_box.text())
+        self.tester.command = self.command_box.text()
 
         self.tester.run()
 
         self.results_box.setText("<h2 style=\"text-align:center\">Themis 2.0 Execution Complete!</h2>");
 
-##        if self.tester.group_tests:
-##            self.results_box.append("<h2> Group Discrimination </h2>")
-####            for key, value in self.tester.group_tests.items():           
-##        if self.tester.causal_tests:
-##            self.results_box.append("<h2> Causal Discrimination </h2>")
-
         for test in self.tester.tests:
+            print (test.i_fields)
             if test.group == True or test.causal == True:
-                self.results_box.append("<h2> Discrimination found! </h2>")
-                if test.group == True:
-                    self.results_box.append("<h3> Your software discriminates with respect to characteristics of the following inputs more than " + "{:.1%}".format(test.threshold) + " of the time: </h3>")
-                    for key,value in self.tester.group_search_results.items():
-                        self.results_box.append("<h3> " + ",".join(key) + "</h3>")
-                        print (",".join(key) + "-->" + value)
-                if test.causal == True:
-                    self.results_box.append("<h3> Your software discriminates against individuals based on characteristics of the following inputs more than " + "{:.1%}".format(test.threshold) + " of the time: </h3>")
-                    for key,value in self.tester.causal_search_results.items():
-                        self.results_box.append("<h3> " + ",".join(key) + "</h3>")
-                        print (",".join(key) + "-->" + value)
+                if self.tester.group_search_results or self.tester.causal_search_results:
+                    self.results_box.append("<h2> Discrimination found! </h2>")
+                    if test.group == True and self.tester.group_search_results:
+                        self.results_box.append("<h3> Your software discriminates with respect to characteristics of the following inputs more than " + "{:.1%}".format(test.threshold) + " of the time: </h3>")
+                        for key,value in self.tester.group_search_results.items():
+                            self.results_box.append("<h3> " + ",".join(key) + "</h3>")
+                            print (",".join(key) + "-->" + value)
+                    if test.causal == True and self.tester.causal_search_results:
+                        self.results_box.append("<h3> Your software discriminates against individuals based on characteristics of the following inputs more than " + "{:.1%}".format(test.threshold) + " of the time: </h3>")
+                        for key,value in self.tester.causal_search_results.items():
+                            self.results_box.append("<h3> " + ",".join(key) + "</h3>")
+                            print (",".join(key) + "-->" + value)
+
+                    detailed_output_btn = QPushButton("More details...")
+                    self.layout3.addWidget(detailed_output_btn, 8, 4)
+                    detailed_output_btn.clicked.connect(self.handleDetailedButton)
+                    self.horizontalGroupBox3.setLayout(self.layout3)
+
                     
         self.results_box.toHtml()
 
-        detailed_output_btn = QPushButton("More details...")
-        self.layout3.addWidget(detailed_output_btn, 8, 4)
-
-        detailed_output_btn.clicked.connect(self.handleDetailedButton)
-
-        self.horizontalGroupBox3.setLayout(self.layout3)
 
     def handleDetailedButton(self):
         dialog = QDialog()
@@ -197,7 +280,7 @@ class App(QDialog):
         layout.addWidget(detailed_output_box, 1, 1, 5, 5)
         horizontalGroupBox.setLayout(layout)
 
-        dialog.setGeometry(self.left, self.top, self.width, self.height-100)
+        dialog.setGeometry(self.left, self.top, self.width, self.height-200)
 
         windowLayout = QVBoxLayout()
         windowLayout.addWidget(horizontalGroupBox)
@@ -205,48 +288,6 @@ class App(QDialog):
 
         dialog.setWindowTitle("Themis 2.0: Detailed Output")
         dialog.exec_()
-
-    def addInput(self):
-        dialog = EditInputWindow(True)
-        dialog.setModal(True)
-        dialog.show()
-
-        if dialog.exec_():
-           for i in range(len(dialog.all_names)):
-                print("Name: " + dialog.all_names[i])
-                print("Type: " + dialog.all_types[i])
-                print("Values: " + dialog.all_values[i])
-
-                name = dialog.all_names[i]
-                kind = dialog.all_types[i]
-                values = dialog.all_values[i]
-
-                self.inputs_table.insertRow(i)
-                self.createEditButtons(self.inputs_table, i, test=None)
-
-                self.setCellValue(name, i, 1)
-                self.setCellValue(kind, i, 2)
-                
-                if kind == "Categorical":
-                    self.setCellValue("{" + values + "}", i, 3)
-                    
-                    self.tester._add_input(name, "Categorical", values)
-                else:
-                    ulb = values.split(',')
-                    lb = ulb[0]
-                    ub = ulb[1]
-                    self.setCellValue("(" + lb + "-" + ub + ")", i, 3)
-                    
-                    self.tester._add_input(name, "Continuous Int", values)
-                    
-        self.resizeCells(self.inputs_table)               
-
-    def addTest(self):
-        dialog = EditTestWindow(True)
-        dialog.setModal(True)
-        dialog.show()
-
-##        if dialog.exec_():
             
 
     def handleLoadButton(self):
@@ -292,7 +333,7 @@ class App(QDialog):
                     inputs.append(field)
             
 
-        self.resizeCells(self.tests_table) 
+            self.resizeCells(self.tests_table) 
         
         i = 0
         for name in self.tester.input_names:
@@ -327,7 +368,7 @@ class App(QDialog):
         table.verticalHeader().setVisible(False)
         table.horizontalHeader().setStretchLastSection(True)
 
-        for i in range(table.rowCount()-1):
+        for i in range(table.columnCount()-1):
             table.resizeColumnToContents(i)      
 
             
@@ -348,7 +389,7 @@ class App(QDialog):
     def createTestsTable(self):
         self.tests_table = QTableWidget()
         self.tests_table.setColumnCount(5)
-        self.tests_table.setHorizontalHeaderLabels(["", "Measurement Type", "Confidence", "Margin", "Notes"])
+        self.tests_table.setHorizontalHeaderLabels(["", "Measurement To Run", "Confidence", "Margin", "Inputs"])
        
         self.resizeCells(self.tests_table)
         
@@ -479,6 +520,12 @@ class EditTestWindow(QDialog):
 
     def createGrid(self, name=None, conf=None, margin=None, test=None):
 
+
+        self.all_measurements = []
+        self.all_confs = []
+        self.all_margins = []
+        self.all_inputs = []
+
         self.horizontalGroupBox = QGroupBox("")
         layout = QGridLayout()
 
@@ -514,14 +561,21 @@ class EditTestWindow(QDialog):
         layout.addWidget(self.discrim_group_cb, 3, 2)
         layout.addWidget(self.discrim_causal_cb, 4, 2)
 
+        self.inputs_label = QLabel("Enter inputs of interest (separated by commas):")
+        self.inputs_box = QLineEdit(self)
+
+        layout.addWidget(self.inputs_label, 5, 1)
+        layout.addWidget(self.inputs_box,5,2)
+                    
+
         self.conf_label = QLabel("Enter confidence value: ")
         self.conf_box = QLineEdit(self)
 
         if conf is not None:
             self.conf_box.setText(str(conf))
 
-        layout.addWidget(self.conf_label, 5, 1)
-        layout.addWidget(self.conf_box, 5, 2)
+        layout.addWidget(self.conf_label, 6, 1)
+        layout.addWidget(self.conf_box, 6, 2)
 
         self.margin_label = QLabel("Enter margin: ")
         self.margin_box = QLineEdit(self)
@@ -529,25 +583,62 @@ class EditTestWindow(QDialog):
         if margin is not None:
             self.margin_box.setText(str(margin))
 
-        layout.addWidget(self.margin_label, 6, 1)
-        layout.addWidget(self.margin_box, 6, 2)
+        layout.addWidget(self.margin_label, 7, 1)
+        layout.addWidget(self.margin_box, 7, 2)
 
         self.add_button = QPushButton("Add")
 
-        layout.addWidget(self.add_button, 7, 2)
+        layout.addWidget(self.add_button, 8, 1)
+        self.add_button.clicked.connect(self.handleAddButton)
 
         self.done_button = QPushButton("Done")
-        self.done_button.clicked.connect(self.handleDoneButton)            
-
-        layout.addWidget(self.done_button, 7, 4)
+        self.done_button.clicked.connect(self.handleDoneButton)
+        
+        layout.addWidget(self.done_button, 8, 4)
         
 
         self.horizontalGroupBox.setLayout(layout)
+        
 
     def selectionChange(self):
 
         return
 
+    def handleAddButton(self):
+
+        if self.group_cb.isChecked():
+            self.all_measurements.append(self.group_cb.text())
+            print(self.group_cb.text())
+        elif self.causal_cb.isChecked():
+            self.all_measurements.append(self.causal_cb.text())
+            print (self.causal_cb.text())
+        elif self.discrim_causal_cb.isChecked() or self.discrim_group_cb.isChecked():
+            if self.discrim_causal_cb.isChecked() and not self.discrim_group_cb.isChecked():
+                self.all_measurements.append("Discrimination Search Causal")
+            elif self.discrim_group_cb.isChecked() and not self.discrim_causal_cb.isChecked():
+                self.all_measurements.append("Discirimination Search Group")
+            else:
+                self.all_measurements.append("Discrimination Search")
+
+        self.all_confs.append(self.conf_box.text())
+        self.all_margins.append(self.margin_box.text())
+
+        inputs_list = self.inputs_box.text().split(",")
+        inputs_tuple = tuple(inputs_list)
+
+        self.all_inputs.append(inputs_tuple)
+
+        self.group_cb.setChecked(False)
+        self.causal_cb.setChecked(False)
+        self.discrim_causal_cb.setChecked(False)
+        self.discrim_group_cb.setChecked(False)
+
+        self.conf_box.setText("")
+        self.margin_box.setText("")
+        self.inputs_box.setText("")
+        
+        
+            
     def handleDoneButton(self):
         self.accept()
 
@@ -652,6 +743,9 @@ class EditInputWindow(QDialog):
         self.all_names.append(self.name_box.text())
         self.all_values.append(self.values_box.text())
         self.all_types.append(self.types.currentText())
+
+        self.name_box.setText("")
+        self.values_box.setText("")
 
         print('input added!')
 

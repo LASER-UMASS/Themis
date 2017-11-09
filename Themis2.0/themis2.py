@@ -85,7 +85,7 @@ class Test:
         Search for causal discrimination if `True`.
     """
     def __init__(self, function="", i_fields=[], conf=0.999, margin=0.0001,
-                    group=False, causal=False, threshold=0.2):
+                    group=False, causal=False, threshold=0.15):
         try:
             self.function = function
             self.i_fields = i_fields
@@ -104,7 +104,7 @@ class Test:
 
             # Alters output based on the test that was ran
             if self.function == "discrimination_search":
-                s += "Ran discrimination search for: \n"
+                print( "Ran discrimination search for: \n")
                 if (self.group == True):
                     s += "Group Discrimination\n"
                 if (self.causal == True):
@@ -166,98 +166,99 @@ class Themis:
             except:
                 print("issue with reading xml file and initializing Themis")
         else:
-            self.cache = {}
+            self._cache = {}
+            self.tests = []
             
     def run(self):
         """
         Run Themis tests specified in the configuration file.
         """
-        try:
+##        try:
  
-            # move these somewhere else - will not go in main output
-            
-##            print("SOFTWARE NAME: " + self.software_name)
-##            print("MAX SAMPLES: " + str(self.max_samples))
-##            print("MIN SAMPLES: " + str(self.min_samples))
-##            print("COMMAND: " + self.command)
-##            print ("RANDOM SEED: " + str(self.rand_seed))
 
-            #key = inputs tuple
-            # value = percentage from test execution
-            self.group_tests = {}
-            self.causal_tests = {}
-            self.group_search_results = {}
-            self.causal_search_results = {}
+        #key = inputs tuple
+        # value = percentage from test execution
+        self.group_tests = {}
+        self.causal_tests = {}
+        self.group_search_results = {}
+        self.causal_search_results = {}
 
-            self.simple_discrim_output = ""
-            self.detailed_discrim_output = ""
+        self.simple_discrim_output = ""
+        self.detailed_discrim_output = ""
 
-            
-            for test in self.tests:
-                random.seed(self.rand_seed)
-                #print ("--------------------------------------------------")
-                if test.function == "causal_discrimination":
-                    suite, p = self.causal_discrimination(i_fields=test.i_fields,
-                                                          conf=test.conf,
-                                                          margin=test.margin)
-                    # store tests for output strings
-                    causal_key = tuple(test.i_fields)
-                    self.causal_tests [causal_key] = "{:.1%}".format(p)
-                    
+        
+        for test in self.tests:
+            random.seed(self.rand_seed)
+            #print ("--------------------------------------------------")
+            if test.function == "causal_discrimination":
+                suite, p = self.causal_discrimination(i_fields=test.i_fields,
+                                                      conf=test.conf,
+                                                      margin=test.margin)
+                # store tests for output strings
+                causal_key = tuple(test.i_fields)
+                self.causal_tests [causal_key] = "{:.1%}".format(p)
+                
 ##                    self.output += str(test)
 ##                    op = 'Your software discriminates on the above inputs ' + "{:.1%}".format(p) +  ' of the time.'
 ##                    self.output += op
-                    
-                elif test.function == "group_discrimination":
-                    suite, p = self.group_discrimination(i_fields=test.i_fields,
-                                                         conf=test.conf,
-                                                         margin=test.margin)
-
-                    # store tests for output strings
-                    group_key = tuple(test.i_fields)
-                    self.group_tests [group_key] = "{:.1%}".format(p)
-
-                    #save min_group and max_group 
-                                       
-                elif test.function == "discrimination_search":
-                    g, c = self.discrimination_search(threshold=test.threshold,
-                                                      conf=test.conf,
-                                                      margin=test.margin,
-                                                      group=test.group,
-                                                      causal=test.causal)
-
-                    if g:
-
-                        for key, value in g.items():
-                            values = ", ".join(key) + " --> " + "{:.1%}".format(value) + "\n"
-                            
-                            self.group_search_results[tuple(key)] = "{:.1%}".format(value)
-                                                    
-                    if c:
-                        for key, value in c.items():
-                            values = ", ".join(key) + " --> " + "{:.1%}".format(value) + "\n"
-
-                            self.causal_search_results[tuple(key)] = "{:.1%}".format(value)
- 
-            
-            print ("Group Discrimination Tests: \n")
-            for key,value in self.group_tests.items():
-                print ('Input(s): ' + str(key) + '--->' + str(value) + "\n")
-
-            print ("Causal Discrimination Tests: \n")
-            for key, value in self.causal_tests.items():
-                print ('Input(s): ' + str(key) + '--->' + str(value) + "\n")
-
-
-            
-            
                 
+            elif test.function == "group_discrimination":
+                suite, p = self.group_discrimination(i_fields=test.i_fields,
+                                                     conf=test.conf,
+                                                     margin=test.margin)
+
+                # store tests for output strings
+                group_key = tuple(test.i_fields)
+                self.group_tests [group_key] = "{:.1%}".format(p)
+
+                #save min_group and max_group 
+                                   
+            elif test.function == "discrimination_search":
+                print ("running discrim search")
+                print (test.conf)
+                print (test.margin)
+                print(test.group)
+                print(test.causal)
+                print(test.threshold)
+                
+                g, c = self.discrimination_search(threshold=test.threshold,
+                                                  conf=test.conf,
+                                                  margin=test.margin,
+                                                  group=test.group,
+                                                  causal=test.causal)
+
+                if g:
+
+                    for key, value in g.items():
+                        values = ", ".join(key) + " --> " + "{:.1%}".format(value) + "\n"
+                        
+                        self.group_search_results[tuple(key)] = "{:.1%}".format(value)
+                                                
+                if c:
+                    for key, value in c.items():
+                        values = ", ".join(key) + " --> " + "{:.1%}".format(value) + "\n"
+
+                        self.causal_search_results[tuple(key)] = "{:.1%}".format(value)
+
+##        
+##        print ("Group Discrimination Tests: \n")
+##        for key,value in self.group_tests.items():
+##            print ('Input(s): ' + str(key) + '--->' + str(value) + "\n")
+##
+##        print ("Causal Discrimination Tests: \n")
+##        for key, value in self.causal_tests.items():
+##            print ('Input(s): ' + str(key) + '--->' + str(value) + "\n")
+
+
+        
+        
             
-            self.short_output = ""
-            self.extended_output = ""
+        
+        self.short_output = ""
+        self.extended_output = ""
             
-        except:
-            print ("Issue in main Themis run")        
+##        except:
+##            print ("Issue in main Themis run")        
 
     def group_discrimination(self, i_fields=None, conf=0.999, margin=0.0001):
         """
@@ -282,27 +283,27 @@ class Themis:
                 The percentage of group discrimination
         """
         assert i_fields != None
-        try:
-            min_group, max_group, test_suite, p = float("inf"), 0, [], 0
-            rand_fields = self._all_other_fields(i_fields)
-            for fixed_sub_assign in self._gen_all_sub_inputs(args=i_fields):
-                count = 0
-                for num_sampled in range(1, self.max_samples):
-                    assign = self._new_random_sub_input(args=rand_fields)
-                    assign.update(fixed_sub_assign)
-                    self._add_assignment(test_suite, assign)
-                    count += self._get_test_result(assign=assign)
+##        try:
+        min_group, max_group, test_suite, p = float("inf"), 0, [], 0
+        rand_fields = self._all_other_fields(i_fields)
+        for fixed_sub_assign in self._gen_all_sub_inputs(args=i_fields):
+            count = 0
+            for num_sampled in range(1, self.max_samples):
+                assign = self._new_random_sub_input(args=rand_fields)
+                assign.update(fixed_sub_assign)
+                self._add_assignment(test_suite, assign)
+                count += self._get_test_result(assign=assign)
 
-                    p, end = self._end_condition(count, num_sampled, conf, margin)
-                    if end:
-                        break
+                p, end = self._end_condition(count, num_sampled, conf, margin)
+                if end:
+                    break
 
-                min_group = min(min_group, p)
-                max_group = max(max_group, p)
+            min_group = min(min_group, p)
+            max_group = max(max_group, p)
 
-            return test_suite, (max_group - min_group)
-        except:
-            print("Issue in group_discrimination")
+        return test_suite, (max_group - min_group)
+##        except:
+##            print("Issue in group_discrimination")
 
     def causal_discrimination(self, i_fields=None, conf=0.999, margin=0.0001):
         """
@@ -326,32 +327,32 @@ class Themis:
             * float
                 The percentage of causal discrimination.
         """
-        try:
-            assert i_fields != None
-            count, test_suite, p = 0, [], 0
-            f_fields = self._all_other_fields(i_fields) # fixed fields
-            for num_sampled in range(1, self.max_samples):
-                fixed_assign = self._new_random_sub_input(args=f_fields)
-                singular_assign = self._new_random_sub_input(args=i_fields)
-                assign = self._merge_assignments(fixed_assign, singular_assign)
+##        try:
+        assert i_fields != None
+        count, test_suite, p = 0, [], 0
+        f_fields = self._all_other_fields(i_fields) # fixed fields
+        for num_sampled in range(1, self.max_samples):
+            fixed_assign = self._new_random_sub_input(args=f_fields)
+            singular_assign = self._new_random_sub_input(args=i_fields)
+            assign = self._merge_assignments(fixed_assign, singular_assign)
+            self._add_assignment(test_suite, assign)
+            result = self._get_test_result(assign=assign)
+            for dyn_sub_assign in self._gen_all_sub_inputs(args=i_fields):
+                if dyn_sub_assign == singular_assign:
+                    continue
+                assign.update(dyn_sub_assign)
                 self._add_assignment(test_suite, assign)
-                result = self._get_test_result(assign=assign)
-                for dyn_sub_assign in self._gen_all_sub_inputs(args=i_fields):
-                    if dyn_sub_assign == singular_assign:
-                        continue
-                    assign.update(dyn_sub_assign)
-                    self._add_assignment(test_suite, assign)
-                    if self._get_test_result(assign=assign) != result:
-                        count += 1
-                        break
-
-                p, end = self._end_condition(count, num_sampled, conf, margin)
-                if end:
+                if self._get_test_result(assign=assign) != result:
+                    count += 1
                     break
 
-            return test_suite, p
-        except:
-            print("Issue in causal discrimination")
+            p, end = self._end_condition(count, num_sampled, conf, margin)
+            if end:
+                break
+
+        return test_suite, p
+##        except:
+##            print("Issue in causal discrimination")
 
     def discrimination_search(self, threshold=0.2, conf=0.99, margin=0.01,
                               group=False, causal=False):
@@ -379,27 +380,33 @@ class Themis:
         tuple of dict
             The lists of subsets of the input characteristics that discriminate.
         """
-        try:
-            assert group or causal
-            group_d_scores, causal_d_scores = {}, {}
-            for sub in self._all_relevant_subs(self.input_order):
-                if self._supset(list(set(group_d_scores.keys())|
-                                     set(causal_d_scores.keys())), sub):
-                    continue
-                if group:
-                    _, p = self.group_discrimination(i_fields=sub, conf=conf,
-                                                       margin=margin)
-                    if p > threshold:
-                        group_d_scores[sub] = p
-                if causal:
-                    _, p = self.causal_discrimination(i_fields=sub, conf=conf,
-                                                       margin=margin)
-                    if p > threshold:
-                        causal_d_scores[sub] = p
+##        try:
+        assert group or causal
+        group_d_scores, causal_d_scores = {}, {}
+        for sub in self._all_relevant_subs(self.input_order):
+            if self._supset(list(set(group_d_scores.keys())|
+                                 set(causal_d_scores.keys())), sub):
+                continue
+            if group:
 
-            return group_d_scores, causal_d_scores
-        except:
-            print("Issue in trying to search for discrimination")
+                _, p = self.group_discrimination(i_fields=sub, conf=conf,
+                                                   margin=margin)
+                print (sub)
+                print(conf)
+                print(margin)
+                print (p)
+                if p > threshold:
+                    group_d_scores[sub] = p
+            if causal:
+                _, p = self.causal_discrimination(i_fields=sub, conf=conf,
+                                                   margin=margin)
+                print(p)
+                if p > threshold:
+                    causal_d_scores[sub] = p
+
+        return group_d_scores, causal_d_scores
+##        except:
+##            print("Issue in trying to search for discrimination")
 
     def _all_relevant_subs(self, xs):
         try:
@@ -440,17 +447,17 @@ class Themis:
 
     def _get_test_result(self, assign=None):
         assert assign != None
-        try:
-            tupled_args = self._tuple(assign)
-            if tupled_args in self._cache.keys():
-                return self._cache[tupled_args]
-
-            cmd = self.command + " " + " ".join(tupled_args)
-            output = subprocess.getoutput(cmd).strip()
-            self._cache[tupled_args] = (subprocess.getoutput(cmd).strip() == "1")
+##        try:
+        tupled_args = self._tuple(assign)
+        if tupled_args in self._cache.keys():
             return self._cache[tupled_args]
-        except:
-            print("Issue in getting the results of the tests")
+
+        cmd = self.command + " " + " ".join(tupled_args)
+        output = subprocess.getoutput(cmd).strip()
+        self._cache[tupled_args] = (subprocess.getoutput(cmd).strip() == "1")
+        return self._cache[tupled_args]
+##        except:
+##            print("Issue in getting the results of the tests")
 
     def _add_assignment(self, test_suite, assign):
         try:
@@ -595,15 +602,32 @@ class Themis:
         except:
             print("Issue in loading the tests")
             
-    def _add_test(self, name=None, conf=None, margin=None, threshold=0.20):
-        self.threshold = threshold
+    def _new_test(self, group, causal, name=None, conf=None, margin=None, i_fields=None, threshold=0.20):
+        assert name != None
+        assert conf != None
+        assert margin != None
+        assert i_fields != None
+
+##        try:
+##            self.tests
+##        except AttributeError:
+##            self.tests = []
 
         try:
-            self.tests
-        except AttributeError:
-            self.tests = []
+            test = Test()
+            test.function = name
+            test.conf = conf
+            test.margin = margin
+            test.group = group
+            test.causal = causal
+            test.i_fields = i_fields
+            test.threshold = threshold
 
-        test = Test()
+            self.tests.append(test)
+
+        except:
+            print("Issue creating test")
+
         
 
 if __name__ == '__main__':

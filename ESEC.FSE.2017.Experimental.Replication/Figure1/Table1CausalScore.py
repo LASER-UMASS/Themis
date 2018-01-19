@@ -3,7 +3,7 @@ This script calculates the Causal discrimination score for the particular input 
 USAGE : 
     argv[1] : Input test suite
     argv[2] : 0/1
-                0 for tace
+                0 for race
                 1 for gender
 '''
 import sys

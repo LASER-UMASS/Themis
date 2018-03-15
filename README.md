@@ -290,4 +290,10 @@ FL, USA, December 2009.
 discrimination. In International Conference on Data Mining (ICDM), pages
 992-1001, Vancouver, BC, Canada, December 2011.
 
+## Licensing
+
+Themis can be licensed for commercial use. Please contact 
+Ling Shen (lxshen@research.umass.edu) and 
+Robert MacWright (macwright@umass.edu) 
+for licensing information.
 

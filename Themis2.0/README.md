@@ -1,12 +1,12 @@
 # README
 
-Welcome to Themis&reg; 2.0 
+Welcome to Themis&trade; 2.0 
 
 ### Installation
 
 Make sure you have Anaconda 2 up and running. You will need the libraries that come with Anaconda (matplotlib, scikit-learn and numpy specifically). You will face issues if you don't have this. 
 
-Once this is completed, simply run Themis&reg; by using the command:
+Once this is completed, simply run Themis&trade; by using the command:
 python Themis.py settings.xml
 
 
@@ -19,7 +19,7 @@ python Themis.py settings.xml
     <min_samples>10</min_samples>
 
 So here the name tag is the name of the software.
-The command is the exact command that is used to execute the software. Please note that the software must be able to accept command line input and should print 0 and 1 as this is what Themis&reg; uses for evaluation. 
+The command is the exact command that is used to execute the software. Please note that the software must be able to accept command line input and should print 0 and 1 as this is what Themis&trade; uses for evaluation. 
 
 
      <input>
@@ -31,7 +31,7 @@ The command is the exact command that is used to execute the software. Please no
             </values>
         </input>
 
-Here you specify the name of the input, its type and the values that you want it to take. Here we have used the data type categorical. Another input data type in continuousInt (very much like Integer in Java). Likewise, you can create as many input variables as you want, however, with more values, the more time Themis&reg; will take to complete.
+Here you specify the name of the input, its type and the values that you want it to take. Here we have used the data type categorical. Another input data type in continuousInt (very much like Integer in Java). Likewise, you can create as many input variables as you want, however, with more values, the more time Themis&trade; will take to complete.
 
 ### Confidence and Threshold values
 

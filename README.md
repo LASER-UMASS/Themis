@@ -1,24 +1,24 @@
-# Themis
+# Themis&reg;
 
-Themis is a testing-based approach for measuring discrimination in a software
-system. For the best explanation of the underlying problem Themis solves,
-Themis algorithms, and an evaluation of Themis, read our paper [Fairness
+Themis&reg; is a testing-based approach for measuring discrimination in a software
+system. For the best explanation of the underlying problem Themis&reg; solves,
+Themis&reg; algorithms, and an evaluation of Themis&reg;, read our paper [Fairness
 Testing: Testing Software for
 Discrimination](http://people.cs.umass.edu/~brun/pubs/pubs/Galhotra17fse.pdf).
 This work won an ACM Distinguished Paper Award at the 
 [ESEC/FSE 2017](http://esec-fse17.uni-paderborn.de/) Conference.
 
-This repository contains Themis (in `Themis1.0/`), instructions for using
-Themis (this `README.md`), a replication package to replicate the experiments
+This repository contains Themis&reg; (in `Themis1.0/`), instructions for using
+Themis&reg; (this `README.md`), a replication package to replicate the experiments
 presented in the ESEC/FSE 2017 paper (in
 `ESEC.FSE.2017.Experimental.Replication`) with its own
 [`README.md`](https://github.com/LASER-UMASS/Themis/tree/master/ESEC.FSE.2017.Experimental.Replication), 
-and subject systems on which Themis has been evaluated (`subjectSystems/`).
+and subject systems on which Themis&reg; has been evaluated (`subjectSystems/`).
 
 ## Recent News Coverage
 
 Several recent news articles have been published about our work on
-discrimination testing and Themis. 
+discrimination testing and Themis&reg;. 
 
 * [Unlearning Racism and Sexism in Learning Machines, in 
 EnterpriseTech](https://www.enterprisetech.com/2017/08/31/unlearning-racism-sexism-learning-machines/), 
@@ -53,7 +53,7 @@ on August 24, 2017.
 
 ## Measuring Discrimination 
 
-The Themis implementation measures two kinds of discrimination: group
+The Themis&reg; implementation measures two kinds of discrimination: group
 discrimination and causal discrimination. 
 
 Imagine you have a piece of software that determines if an applicant should
@@ -108,9 +108,9 @@ for traditionally-minority names was more likely to yield ads related to
 arrest records. Such software behavior can contribute to racist stereotypes
 and other grave societal consequences.
 
-While prior research has considered discrimination in software, Themis
+While prior research has considered discrimination in software, Themis&reg;
 focuses on measuring causality in discrimination. Software testing allows
-Themis to perform hypothesis testing, such as "does changing a person's race
+Themis&reg; to perform hypothesis testing, such as "does changing a person's race
 affect whether the software recommends giving that person a loan?" This
 approach measures discrimination more accurately than prior work that focused
 on identifying differences in software output distributions, correlations, or
@@ -121,16 +121,16 @@ algorithmic design errors, implementation bugs, emergent properties of
 component interactions, or automatically learned properties from biased data.
 Data-based decisions, such as those made by software relying on data mining
 or machine learning in particular, pose a serious challenge because the mined
-decision models are often not human readable. Themis uses software testing to
-find discrimination, whether it is intentional or unintentional. Themis' goal
+decision models are often not human readable. Themis&reg; uses software testing to
+find discrimination, whether it is intentional or unintentional. Themis&reg;' goal
 is to empower the stakeholders to better understand software behavior, judge
 when unwanted bias is present, and, ultimately, improve the software.
 
-## Running Themis:
+## Running Themis&reg;:
 
-The main entry point for Themis is `main.py`. It allows the user to run
-Themis via a configuration file (`settings.txt`). `main.py` uses `Themis.py`,
-which implements most of the Themis functionality.
+The main entry point for Themis&reg; is `main.py`. It allows the user to run
+Themis&reg; via a configuration file (`settings.txt`). `main.py` uses `Themis.py`,
+which implements most of the Themis&reg; functionality.
 
 To run Themis, you need to do two things. You need to specify an input schema
 file (`settings.txt`) and modify `main.py` to specify which discrimination
@@ -138,10 +138,10 @@ type to compute.
 
 ### Input schema
 
-Themis needs to know how to run the software being tested and the input
+Themis&reg; needs to know how to run the software being tested and the input
 schema for the valid inputs to the software. The `settings.txt` consists of
 the number of input characteristics, a description for each characteristic,
-and the command to run the software. Because Themis requires a particular
+and the command to run the software. Because Themis&reg; requires a particular
 command-line format, it is likely to require writing a simple wrapper around
 the software under test.
 
@@ -167,9 +167,9 @@ take on.
 Next, `settings.txt` includes the executable part of the command to run
 the software, preceded by `command:`.
 
-Themis expects the software to run using the command executable, followed by
+Themis&reg; expects the software to run using the command executable, followed by
 a combination of characteristic name and value pairs. For example, for the
-above `settings.txt`, Themis may execute the following command:
+above `settings.txt`, Themis&reg; may execute the following command:
 ```
 python loan.py race green age 18
 ```
@@ -177,15 +177,15 @@ and expects a binary output in the form of 0 or 1 printed to standard output.
 
 ### Specifying what to measure
 
-There are two ways to use Themis. First, given a set of input characteristics
-and an acceptable error bound, Themis can compute the *group* and the
+There are two ways to use Themis&reg;. First, given a set of input characteristics
+and an acceptable error bound, Themis&reg; can compute the *group* and the
 *causal* discrimination scores for those input characteristics. Second, given
-a discrimination threshold and an acceptable error bound, Themis can compute
+a discrimination threshold and an acceptable error bound, Themis&reg; can compute
 all characteristics with respect to which the software discriminates at least
-as much as the threshold. To make these computations, Themis generates test
+as much as the threshold. To make these computations, Themis&reg; generates test
 suites.
 
-To use Themis, one creates a `main.py` script  out of a combination of the following five commands:
+To use Themis&reg;, one creates a `main.py` script  out of a combination of the following five commands:
 ```
 causalDiscrimination(..)
 groupDiscrimination(..)
@@ -241,18 +241,18 @@ Prints the test suite used for the last discrimination-computing function.
 
 ## Subject systems
 
-The evaluation in [1] applied Themis to eight subject software systems (named
+The evaluation in [1] applied Themis&reg; to eight subject software systems (named
 A-H), trained in different ways, for a total of twenty different software
 system instances. The `subjectSystems/` folder contains the code for these
 subject systems.
 
-`A/` Discrimination-aware logistic regression [2] and Themis wrapper scripts for executing it.
+`A/` Discrimination-aware logistic regression [2] and Themis&reg; wrapper scripts for executing it.
 
-`B/` Discrimination-aware decision tree classifier [3] and Themis wrapper scripts for executing it.
+`B/` Discrimination-aware decision tree classifier [3] and Themis&reg; wrapper scripts for executing it.
 
-`C/` Discrimination-aware naive Bayes classifier [4] and Themis wrapper scripts for executing it.
+`C/` Discrimination-aware naive Bayes classifier [4] and Themis&reg; wrapper scripts for executing it.
 
-`D/` Discrimination-aware decision tree classifier [5] and Themis wrapper scripts for executing it.
+`D/` Discrimination-aware decision tree classifier [5] and Themis&reg; wrapper scripts for executing it.
 
 `fairness_unaware/` Four standard discrimination-unaware classifiers,
 described as systems E (naive Bayes), F (decision tree), G (logistic
@@ -292,9 +292,9 @@ discrimination. In International Conference on Data Mining (ICDM), pages
 
 ## Licensing
 
-Themis is distributed only to end users and for academic use only.
+Themis&reg; is distributed only to end users and for academic use only.
 
-Themis can also be licensed for commercial use through the University of 
+Themis&reg; can also be licensed for commercial use through the University of 
 Massachusetts Amherst. To obtain a license, contact Thomas Ferguson 
 (tferguson@umass.edu) and Robert MacWright (macwright@umass.edu), and copy 
 Yuriy Brun (brun@cs.umass.edu).

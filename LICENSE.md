@@ -1,5 +1,5 @@
 # Licensing
 
-Themis is distributed only to end users and for academic use only.
+Themis&reg; is distributed only to end users and for academic use only.
 
-Themis can also be licensed for commercial use through the University of Massachusetts Amherst. To obtain a license, contact Thomas     Ferguson (tferguson@umass.edu) and Robert MacWright (macwright@umass.edu), and copy Yuriy Brun (brun@cs.umass.edu).
+Themis&reg; can also be licensed for commercial use through the University of Massachusetts Amherst. To obtain a license, contact Thomas     Ferguson (tferguson@umass.edu) and Robert MacWright (macwright@umass.edu), and copy Yuriy Brun (brun@cs.umass.edu).

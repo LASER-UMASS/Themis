@@ -345,6 +345,11 @@ class App(QDialog):
         
         # set text boxes from Themis
 
+        self.command_box.setText(command)
+
+        self.tests_table.clearContents()
+        self.inputs_table.clearContents()
+
 
         index = 0
         inputs = []

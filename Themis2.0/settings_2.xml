@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <settings>
     <name>Software</name>
-    <command>python loan.py</command>
+    <command>python loan_2.py</command>
     <seed>42</seed>
     <max_samples>10000</max_samples>
     <min_samples>10</min_samples>

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <settings>
     <name>Software</name>
-    <command>python loan.py</command>
+    <command>python loan_3.py</command>
     <seed>42</seed>
     <max_samples>10000</max_samples>
     <min_samples>10</min_samples>
@@ -41,6 +41,7 @@
             <conf>0.98</conf>
             <margin>0.02</margin>
             <group/>
+            <causal/>
         </test>
     </tests>
 </settings>

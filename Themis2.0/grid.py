@@ -3,6 +3,8 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import xml.etree.ElementTree as ET
+
+import themis2
  
 class App(QDialog):
  
@@ -29,10 +31,11 @@ class App(QDialog):
         windowLayout.addWidget(self.horizontalGroupBox2)
         windowLayout.addWidget(self.horizontalGroupBox3)
         self.setLayout(windowLayout)
- 
+        
         self.show()
 
     def createThemisGrid(self):
+        
         self.horizontalGroupBox4 = QGroupBox()
         layout4 = QGridLayout()
 
@@ -66,9 +69,6 @@ class App(QDialog):
 
         self.createInputsTable()
 
-        #inputs_table.selectedItems()
-        #inputs_table.selectedRanges()
-
         load_button = QPushButton('Load...')
         load_button.clicked.connect(self.handleLoadButton)
         
@@ -97,21 +97,35 @@ class App(QDialog):
         self.horizontalGroupBox3 = QGroupBox("")
         layout3 = QGridLayout()
 
+        run_button = QPushButton("Run")
+        # run themis
+        run_button.clicked.connect(self.runThemis)
+
         self.results_box = QTextEdit()
         self.results_box.setReadOnly(True)
-        self.results_box.setText('This is where results will be printed.')
-
-        run_button = QPushButton("Run")
         
         layout3.addWidget(run_button,1, 1)
-        layout3.addWidget(self.results_box, 2, 1, 5, 5)        
-
+        layout3.addWidget(self.results_box, 2, 1, 5, 5)
+        
  
         self.horizontalGroupBox.setLayout(layout)
         self.horizontalGroupBox2.setLayout(layout2)
         self.horizontalGroupBox3.setLayout(layout3)
         self.horizontalGroupBox4.setLayout(layout4)
 
+    def runThemis(self):
+
+        self.tester.run()
+
+        self.results_box.setText(self.getTesterOutput)
+
+
+    def getTesterOutput(self):
+
+        results = self.tester.output
+
+        return results
+        
     def handleAddButton(self):
         self.dialog.setModal(True)
         self.dialog.show()
@@ -122,8 +136,89 @@ class App(QDialog):
 
         if filename[0]:
             self.file = open(filename[0], 'r')
-
+            # add themis instance with loaded file        
+        
+       
         self.processSettingsFiles()
+
+    def processSettingsFiles(self):        
+        self.tree = ET.parse(self.file)
+        root = self.tree.getroot()
+
+
+        run_command = root.find('command').text
+        self.command_box.setText(run_command)
+
+        seed = root.find('seed').text
+        self.seed_box.setText(seed)
+
+        max_samples = root.find('max_samples').text
+        self.max_box.setText(max_samples)
+
+
+        min_samples = root.find('min_samples').text
+        self.min_box.setText(min_samples)
+
+        # column 1 = Input Name
+        # column 2 = Input Type
+        # column 3 = Values
+        
+        #for categorical values
+        self.inputs = []
+        ctr = 0
+        
+        for run_input in root.iter('input'):
+            name = run_input.find('name').text
+            print(name)
+            self.inputs[ctr] = name
+            
+            categoricalFlag = False
+            for j in run_input.iter('type'):
+
+                if j.text == "categorical":
+
+                    categoricalFlag = True
+            values = []
+            if(categoricalFlag is True):
+                for i in run_input.iter('value'):
+
+                    values.append(i.text)
+            else:
+
+                for lbound in run_input.iter('lowerbound'):
+
+                    values.append(lbound.text)
+                for ubound in run_input.iter('upperbound'):
+                    values.append(ubound.text)
+
+
+            if (len(values) != 0):
+                self.setCellValue(values.__str__(), ctr, 3)
+            ctr += 1
+
+            index = 0
+            
+            for run_test in root.iter('test'):
+                function = ""
+                configuration = ""
+                margin = ""
+                for func in run_test.iter("function"):
+                    function = func.text
+                for config in run_test.iter("conf"):
+                    configuration = config.text
+                for marg in run_test.iter("margin"):
+                    margin = marg.text
+                    
+                print(function)
+                print(configuration)
+                print(margin)
+                print("Got all the values")
+                
+                self.setTestTableValue(function,index,1)                
+                self.setTestTableValue(configuration, index, 2)
+                self.setTestTableValue(margin, index, 3)
+                index += 1
+
 
     def handleSaveButton(self):
         self.tree.write("settings")
@@ -178,103 +273,7 @@ class App(QDialog):
         
         table.setCellWidget(row,0,cellWidget)
 
-    def processSettingsFiles(self):
-        self.tree = ET.parse(self.file)
-        root = self.tree.getroot()
-
-
-        run_command = root.find('command').text
-        self.command_box.setText(run_command)
-
-        seed = root.find('seed').text
-        self.seed_box.setText(seed)
-
-
-        max_samples = root.find('max_samples').text
-        self.max_box.setText(max_samples)
-
-        min_samples = root.find('min_samples').text
-        self.min_box.setText(min_samples)
-
-        # column 1 = Input Name
-        # column 2 = Input Type
-        # column 3 = Values
-        # column 4 = Lower Bound
-        # column 5 = Upper Bound
-
-        #for categorical values
-        self.input_values = {}
-        ctr = 0
-        for run_input in root.iter('input'):
-            name = run_input.find('name').text
-            print(name)
-            categoricalFlag = False
-            for j in run_input.iter('type'):
-
-                if j.text == "categorical":
-
-                    categoricalFlag = True
-            values = []
-            if(categoricalFlag is True):
-                for i in run_input.iter('value'):
-
-                    values.append(i.text)
-            else:
-
-                for lbound in run_input.iter('lowerbound'):
-
-                    values.append(lbound.text)
-                for ubound in run_input.iter('upperbound'):
-                    values.append(ubound.text)
-
-
-            if (len(values) != 0):
-                self.setCellValue(values.__str__(), ctr, 3)
-            ctr += 1
-
-            index = 0
-            for run_test in root.iter('test'):
-                str1 = ""
-                str2 = ""
-                str3 = ""
-                for func in run_test.iter("function"):
-                    str1 = func.text
-                for config in run_test.iter("conf"):
-                    str2 = config.text
-                for marg in run_test.iter("margin"):
-                    str3 = marg.text
-                print(str1)
-                print(str2)
-                print(str3)
-                print("Got all the values")
-                self.setTestTableValue(str1,index,1)
-                self.setTestTableValue(str2, index, 2)
-                self.setTestTableValue(str3, index, 3)
-                index += 1
-                        #print(value + "  " + "These are the values")
-##                values[i] = value
-##                i +=1
-                
-##            self.input_values[name] = values
-
-##        for key in self.input_values:
-##            print (key)
-##            print (self.input_values[key])
-
-        for run_input in root.iter('input'):
-            name = run_input.find('name').text
-            for i in range(self.inputs_table.rowCount()):
-                item = self.inputs_table.item(i,1)
-                if item == None:
-                    self.setCellValue(name,i,1)
-                    break
-            input_type = run_input.find('type').text
-            for i in range(self.inputs_table.rowCount()):
-                item = self.inputs_table.item(i,2)
-                if item == None:
-                    self.setCellValue(input_type,i,2)
-                    break
-
+    
 
     def setCellValue(self, value, row, column):
         new_input = QTableWidgetItem()

@@ -11,6 +11,7 @@ import math
 import random
 import scipy.stats as st
 import xml.etree.ElementTree as ET
+import copy
 
 
 class Input:
@@ -114,15 +115,6 @@ class Test:
             elif self.function == "group_discrimination":
                 s += "Calculated group discrimination for the following sets of inputs: \n (" + ", ".join(self.i_fields) + ") \n\n"
 
-            s += "Discrimination result(s): \n"
-
-                # This would be in extra window so may may separate function for this
-                
-##                s += "Threshold: " + str(self.threshold) + "\n"
-##                s += "Group: " + str(self.group) + "\n"
-##                s += "Causal: " + str(self.causal) + "\n"
-##            s += "Confidence: " + str(self.conf) + "\n"
-##            s += "Margin: " + str(self.margin) + "\n"
             return s
         except:
             print("Issue with returning a string version of the test details")
@@ -183,15 +175,19 @@ class Themis:
         self.group_search_results = {}
         self.causal_search_results = {}
 
+        self.group_measurement_results = []
+        self.causal_measurement_results = []
+
         self.simple_discrim_output = ""
         self.detailed_discrim_output = ""
 
         
         for test in self.tests:
+            print (test)
             random.seed(self.rand_seed)
             #print ("--------------------------------------------------")
             if test.function == "causal_discrimination":
-                suite, p = self.causal_discrimination(i_fields=test.i_fields,
+                suite, p, self.causal_pairs = self.causal_discrimination(i_fields=test.i_fields,
                                                       conf=test.conf,
                                                       margin=test.margin)
                 # store tests for output strings
@@ -203,7 +199,7 @@ class Themis:
 ##                    self.output += op
                 
             elif test.function == "group_discrimination":
-                suite, p = self.group_discrimination(i_fields=test.i_fields,
+                suite, p, _, _ = self.group_discrimination(i_fields=test.i_fields,
                                                      conf=test.conf,
                                                      margin=test.margin)
 
@@ -284,7 +280,8 @@ class Themis:
         """
         assert i_fields != None
 ##        try:
-        min_group, max_group, test_suite, p = float("inf"), 0, [], 0
+        min_group_score, max_group_score, test_suite, p = float("inf"), 0, [], 0
+        min_group_assign, max_group_assign = "",""
         rand_fields = self._all_other_fields(i_fields)
         for fixed_sub_assign in self._gen_all_sub_inputs(args=i_fields):
             count = 0
@@ -297,11 +294,15 @@ class Themis:
                 p, end = self._end_condition(count, num_sampled, conf, margin)
                 if end:
                     break
+            print (fixed_sub_assign[i_fields[0]] + "--> " + str(p))
+            if p < min_group_score:
+                min_group_score = p
+                min_group_assign = fixed_sub_assign[i_fields[0]]
+            if p > max_group_score:
+                max_group_score = p
+                max_group_assign = fixed_sub_assign[i_fields[0]]
 
-            min_group = min(min_group, p)
-            max_group = max(max_group, p)
-
-        return test_suite, (max_group - min_group)
+        return test_suite, (max_group_score - min_group_score), (min_group_score,min_group_assign,max_group_score,max_group_assign)
 ##        except:
 ##            print("Issue in group_discrimination")
 
@@ -331,10 +332,14 @@ class Themis:
         assert i_fields != None
         count, test_suite, p = 0, [], 0
         f_fields = self._all_other_fields(i_fields) # fixed fields
+        causal_pairs = []
+        
         for num_sampled in range(1, self.max_samples):
             fixed_assign = self._new_random_sub_input(args=f_fields)
             singular_assign = self._new_random_sub_input(args=i_fields)
             assign = self._merge_assignments(fixed_assign, singular_assign)
+            print ("Assign --> " , assign)
+            causal_assign1 = copy.deepcopy(assign)
             self._add_assignment(test_suite, assign)
             result = self._get_test_result(assign=assign)
             for dyn_sub_assign in self._gen_all_sub_inputs(args=i_fields):
@@ -344,13 +349,14 @@ class Themis:
                 self._add_assignment(test_suite, assign)
                 if self._get_test_result(assign=assign) != result:
                     count += 1
+                    causal_pairs.append((causal_assign1,copy.deepcopy(assign)))
                     break
 
             p, end = self._end_condition(count, num_sampled, conf, margin)
             if end:
                 break
 
-        return test_suite, p
+        return test_suite, p, causal_pairs
 ##        except:
 ##            print("Issue in causal discrimination")
 
@@ -389,20 +395,23 @@ class Themis:
                 continue
             if group:
 
-                _, p = self.group_discrimination(i_fields=sub, conf=conf,
+                suite, p, data = self.group_discrimination(i_fields=sub, conf=conf,
+                                                   margin=margin)
+                
+                if p > threshold:
+                    group_d_scores[sub] = p
+                    self.group_measurement_results.append(MeasurementResult(causal=False, i_fields=sub, p=p, testsuite=suite, data=data)) 
+            if causal:
+                suite, p, cp = self.causal_discrimination(i_fields=sub, conf=conf,
                                                    margin=margin)
                 print (sub)
                 print(conf)
                 print(margin)
                 print (p)
-                if p > threshold:
-                    group_d_scores[sub] = p
-            if causal:
-                _, p = self.causal_discrimination(i_fields=sub, conf=conf,
-                                                   margin=margin)
-                print(p)
+                print (cp)
                 if p > threshold:
                     causal_d_scores[sub] = p
+                    self.causal_measurement_results.append(MeasurementResult(causal=True, i_fields=sub, p=p, testsuite=suite, data=cp))
 
         return group_d_scores, causal_d_scores
 ##        except:
@@ -569,7 +578,7 @@ class Themis:
                 lowerbound = ulb[0]
                 upperbound = ulb[1]
 
-                local_values = range(int(lowerbound),int(upperbound))
+                local_values = range(int(lowerbound),int(upperbound)+1)
 
                 self.inputs[name] = Input(name=name, values=local_values, kind="continuousInt", lb = str(lowerbound), ub = str(upperbound))
             else:
@@ -628,7 +637,14 @@ class Themis:
         except:
             print("Issue creating test")
 
-        
+class MeasurementResult(object):
+
+    def __init__(self, causal=False, i_fields=None, p=None, testsuite=None, data=None):
+        self.causal = causal
+        self.i_fields = i_fields
+        self.p = p
+        self.testsuite = testsuite
+        self.data = data
 
 if __name__ == '__main__':
     try:

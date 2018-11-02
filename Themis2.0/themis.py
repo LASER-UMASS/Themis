@@ -5,7 +5,7 @@
 from __future__ import division
 
 import argparse
-import commands
+import subprocess
 from itertools import chain, combinations, product
 import math
 import random
@@ -381,8 +381,8 @@ class Themis:
                 return self._cache[tupled_args]
 
             cmd = self.command + " " + " ".join(tupled_args)
-            output = commands.getoutput(cmd).strip()
-            self._cache[tupled_args] = (commands.getoutput(cmd).strip() == "1")
+            output = subprocess.getoutput(cmd).strip()
+            self._cache[tupled_args] = subprocess.getoutput(cmd).strip() == "1")
             return self._cache[tupled_args]
         except:
             print("Issue in getting the results of the tests")

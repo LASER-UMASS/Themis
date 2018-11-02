@@ -1,5 +1,6 @@
 import sys
 from PyQt5.QtWidgets import *
+import PyQt5.QtGui as QtGui
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import xml.etree.ElementTree as ET
@@ -220,23 +221,14 @@ class App(QDialog):
         self.tester.run()
 
         self.results_box.setText("<h2 style=\"text-align:center\">Themis 2.0 Execution Complete!</h2>");
+        self.results_box.repaint()
 
         for test in self.tester.tests:
             print (test)
             if test.group == True or test.causal == True:
                 if self.tester.group_search_results or self.tester.causal_search_results:
                     self.results_box.append("<h2> Discrimination found! </h2>")
-                    #if test.group == True and self.tester.group_search_results:
-                        #self.results_box.append("<h3> Your software discriminates with respect to characteristics of the following inputs more than " + "{:.1%}".format(test.threshold) + " of the time: </h3>")
-                        #for key,value in self.tester.group_search_results.items():
-                            #self.results_box.append("<h3> " + ",".join(key) + "</h3>")
-                            #print (",".join(key) + "-->" + value)
-                    #if test.causal == True and self.tester.causal_search_results:
-                        #self.results_box.append("<h3> Your software discriminates against individuals based on characteristics of the following inputs more than " + "{:.1%}".format(test.threshold) + " of the time: </h3>")
-##                        for key,value in self.tester.causal_search_results.items():
-##                            self.results_box.append("<h3> " + ",".join(key) + "</h3>")
-##                            print (",".join(key) + "-->" + value)
-
+                    self.results_box.repaint()
                     detailed_output_btn = QPushButton("More details...")
                     self.layout3.addWidget(detailed_output_btn, 8, 4)
                     detailed_output_btn.clicked.connect(self.handleDetailedButton)
@@ -314,6 +306,8 @@ class App(QDialog):
                                 
         detailed_output_box.toHtml()
 
+        detailed_output_box.moveCursor(QtGui.QTextCursor.Start)
+
         layout.addWidget(detailed_output_box, 1, 1, 5, 5)
         horizontalGroupBox.setLayout(layout)
 
@@ -325,11 +319,12 @@ class App(QDialog):
 
         dialog.setWindowTitle("Themis 2.0: Detailed Output")
         dialog.exec_()
+
             
 
     def handleLoadButton(self):
         dialog = QFileDialog()
-        filename = dialog.getOpenFileName(self, "Open File", "/home")
+        filename = dialog.getOpenFileName(self, "Open File", "~/Documents/Themis/Themis2.0")
 
         if filename[0]:
             self.file = open(filename[0], 'r')
@@ -346,6 +341,7 @@ class App(QDialog):
         # set text boxes from Themis
 
         self.command_box.setText(command)
+        self.results_box.clear()
 
         self.tests_table.clearContents()
         self.inputs_table.clearContents()

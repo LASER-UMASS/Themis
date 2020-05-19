@@ -41,7 +41,7 @@ August 22, 2017.
   Release](http://www.umass.edu/newsoffice/article/umass-amherst-computer-scientists-develop), August 14, 2017.
 
 * [Kann Software rassistisch 
-sein?](http://www.deutschlandfunk.de/testprogramm-themis-kann-software-rassistisch-sein.684.de.html?dram:article_id=395507)
+sein?](https://www.deutschlandfunk.de/testprogramm-themis-kann-software-rassistisch-sein.684.de.html?dram:article_id=395507)
 Our interview on the German Public Radio Deutschlandfunk [Computer und 
 Kommunikation](http://www.deutschlandfunk.de/computer-und-kommunikation.683.de.html) segment, September 9, 2017. (In German.)
 

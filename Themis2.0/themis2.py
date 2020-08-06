@@ -422,7 +422,7 @@ class Themis:
             return chain.from_iterable(combinations(xs, n) \
                                         for n in range(1, len(xs)))
         except:
-            print("Issue in returning reltive ssubsets. Possible a divide by zer error")
+            print("Issue in returning relative subsets. Possibly a divide by zero error")
 
     def _supset(self, list_of_small, big):
        try:
